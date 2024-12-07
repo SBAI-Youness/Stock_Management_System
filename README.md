@@ -40,7 +40,7 @@ The **Stock Management System** is a console-based application developed in C fo
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/SBAI-Youness/Projet_C.git
+   git clone https://github.com/SBAI-Youness/Stock_Management_System.git
    ```
 2. Navigate to the project directory:
    ```bash
