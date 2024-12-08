@@ -127,8 +127,12 @@ void user_session(const struct User *user) {
     print_project_name();
     printf(DARK_GREEN UNDERLINE "\t--- Welcome, " RESET CYAN UNDERLINE "%s" RESET DARK_GREEN UNDERLINE"! ---\n\n" RESET, user->username);
     printf("1. View Profile\n");
-    printf("2. Logout\n");
-    printf("3. Exit\n");
+    printf("2. Product Management\n");
+    printf("3. View Products\n");
+    printf("4. Search Products\n");
+    printf("5. Sort Products\n");
+    printf("6. Log out\n");
+    printf("7. Exit\n");
     printf(" >> ");
     scanf("%zu", &sessionChoice);
     getchar(); // Clear input buffer
@@ -138,14 +142,26 @@ void user_session(const struct User *user) {
         user->display_user(user);
         break;
       case 2:
-        log_out();
+        // Add, Modify or delete a product
         break;
       case 3:
+        // View all products in the database
+        break;
+      case 4:
+        // Search for a product by its name and username
+        break;
+      case 5:
+        // Sort products by name and unit price
+        break;
+      case 6:
+        log_out();
+        break;
+      case 7:
         exit_program();
       default:
         invalid_choice();
     }
-  } while (sessionChoice != 2);
+  } while (sessionChoice != 6);
 }
 
 void set_username(struct User *self) {
@@ -412,4 +428,18 @@ void free_user(struct User *self) {
   if (self->password != NULL)
     free(self->password); // Free password memory
   free(self); // Free the User struct itself
+
+  // Set the user attributes to NULL
+  self->username = NULL;
+  self->password = NULL;
+
+  // Set the user methods to NULL
+  self->set_username = NULL;
+  self->set_password = NULL;
+  self->display_user = NULL;
+  self->save_user = NULL;
+  self->free_user = NULL;
+
+  // Set the user structure to NULL
+  self = NULL;
 }
