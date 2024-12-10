@@ -1,4 +1,4 @@
-#include "../include/users.h"
+#include "../include/utils.h"
 
 struct User *create_user() {
   // Allocate memory for the new user
@@ -27,19 +27,13 @@ struct User *create_user() {
   return newUser; // Return the pointer to the new user
 }
 
-void set_user_methods(struct User *self) {
-  // Check if the user structure is valid
-  if (self == NULL) {
-    print_error_message("Invalid user structure");
-    return;
-  }
-
+void set_user_methods(struct User *user) {
   // Assign the function pointers to the user methods
-  self->set_username = set_username;
-  self->set_password = set_password;
-  self->display_user = display_user;
-  self->save_user = save_user;
-  self->free_user = free_user;
+  user->set_username = set_username;
+  user->set_password = set_password;
+  user->display_user = display_user;
+  user->save_user = save_user;
+  user->free_user = free_user;
 }
 
 void sign_up() {
@@ -47,25 +41,29 @@ void sign_up() {
   struct User *user = create_user();
 
   // Check if the user was created successfully
-  if (user == NULL)
+  if (user == NULL) {
+    print_error_message("Failed to create a new user");
     return;
+  }
 
   // Set the user's username and password
   bool isUnique = false; // Flag to check if the username is unique
+
   while (isUnique == false) {
     system("cls");
     print_project_name();
     printf(DARK_GREEN UNDERLINE "\t--- Sign up ---\n\n" RESET);
-    // Set the user's username
-    user->set_username(user);
-    if (is_username_taken(user->username) == true) {
+    user->set_username(user); // Set the user's username
+
+    // Check if the username is unique
+    if (is_username_taken(user->username) == false)
+      isUnique = true;
+    else {
       printf(ORANGE "Username is already taken. Please choose a different username.\n" RESET);
-      sleep(5); // Wait for 5 seconds
+      sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
     }
-    else
-      isUnique = true;
   }
 
   // Set the user's password
@@ -74,7 +72,6 @@ void sign_up() {
   user->save_user(user);
 
   print_success_message("User successfully signed up");
-  sleep(3); // Wait for 3 seconds
 
   user_session(user);
 
@@ -86,10 +83,13 @@ void log_in() {
   struct User *user = create_user();
 
   // Check if the user was created successfully
-  if (user == NULL)
+  if (user == NULL) {
+    print_error_message("Failed to create a new user");
     return;
+  }
 
   bool isAuthenticated = false; // Flag to check if the user is authenticated
+
   while (isAuthenticated == false) {
     system("cls");
     print_project_name();
@@ -100,12 +100,11 @@ void log_in() {
     // Check if the user is authenticated
     if (authenticate_user(user->username, user->password) == true) {
       print_success_message("User successfully logged in");
-      sleep(3); // Wait for 3 seconds
       isAuthenticated = true;
     }
     else {
       printf(ORANGE "Invalid username or password. Please try again.\n" RESET);
-      sleep(5); // Wait for 5 seconds
+      sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
@@ -135,7 +134,7 @@ void user_session(const struct User *user) {
     printf("7. Exit\n");
     printf(" >> ");
     scanf("%zu", &sessionChoice);
-    getchar(); // Clear input buffer
+    rewind(stdin); // Clear input buffer
 
     switch (sessionChoice) {
       case 1:
@@ -158,26 +157,21 @@ void user_session(const struct User *user) {
         break;
       case 7:
         exit_program();
+        break;
       default:
         invalid_choice();
     }
-  } while (sessionChoice != 6);
+  } while (sessionChoice != 6); // Exit the loop if the user chooses to log out
 }
 
 void set_username(struct User *self) {
-  // Check if the user structure is valid
-  if (self == NULL) {
-    print_error_message("Invalid user structure");
-    return;
-  }
-
   bool isValid = false;
+
   while (isValid == false) {
     printf("Username: ");
     rewind(stdin);
     if (fgets(self->username, MAX_USERNAME_LENGTH, stdin) == NULL) {
-      // Handle input error
-      print_error_message("Failed to read username");
+      print_error_message("Failed to read username"); // Handle input error
       return;
     }
 
@@ -196,14 +190,14 @@ void set_username(struct User *self) {
         isValid = true;
       else {
         printf(ORANGE "Username can only contain alphanumeric characters and maximum 2 underscores, and must include at least one alphanumeric character.\n" RESET);
-        sleep(5); // Wait for 5 secondes
+        sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
         printf("\033[A\033[2K");
         printf("\033[A\033[2K");
       }
     }
     else {
       printf(ORANGE "Username must be between %d and %d characters long.\n" RESET, MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH);
-      sleep(5); // Wait for 5 secondes
+      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
     }
@@ -211,12 +205,6 @@ void set_username(struct User *self) {
 }
 
 bool is_username_valid(const char *username) {
-  // Check if the username is valid
-  if (username == NULL) {
-    print_error_message("Invalid username");
-    return false; // Null or empty username is invalid
-  }
-
   bool hasAlphaNumeric = false;
   size_t underscoreCount = 0,
          length = strlen(username);
@@ -238,19 +226,13 @@ bool is_username_valid(const char *username) {
 }
 
 void set_password(struct User *self) {
-  // Check if the user structure is valid
-  if (self == NULL) {
-    print_error_message("Invalid user structure");
-    return;
-  }
-
   bool isValid = false; // Flag to check if the password is valid
+
   while (isValid == false) {
     printf("Password: ");
     rewind(stdin);
     if (fgets(self->password, MAX_PASSWORD_LENGTH, stdin) == NULL) {
-      // Handle input error
-      print_error_message("Failed to read password");
+      print_error_message("Failed to read password"); // Handle input error
       return;
     }
 
@@ -269,14 +251,14 @@ void set_password(struct User *self) {
         isValid = true;
       else {
         printf(ORANGE "Password must contain at least one uppercase letter, one lowercase letter, and one digit.\n" RESET);
-        sleep(5); // Wait for 5 seconds
+        sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
         printf("\033[A\033[2K");
         printf("\033[A\033[2K");
       }
     }
     else {
       printf(ORANGE "Password must be between %d and %d characters long.\n" RESET, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH);
-      sleep(5); // Wait for 5 seconds
+      sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
     }
@@ -284,12 +266,6 @@ void set_password(struct User *self) {
 }
 
 bool is_password_valid(const char *password) {
-  // Check if the password is valid
-  if (password == NULL) {
-    print_error_message("Invalid password");
-    return false; // Null or empty password is invalid
-  }
-
   // Ensure password contains at least one digit, one lowercase, and one uppercase letter
   bool has_digit = false,
        has_lower = false,
@@ -311,12 +287,6 @@ bool is_password_valid(const char *password) {
 }
 
 bool is_username_taken(const char *username) {
-  //  Check if the username is valid
-  if (username == NULL) {
-    print_error_message("Invalid username");
-    return false;
-  }
-
   // Open the users file to search for the user
   FILE *file = fopen(USERS_FILE, "r");
 
@@ -339,12 +309,6 @@ bool is_username_taken(const char *username) {
 }
 
 bool authenticate_user(const char *username, const char *password) {
-  // Check if the username and password are valid
-  if (username == NULL || password == NULL) {
-    print_error_message("Invalid username or password");
-    return false;
-  }
-
   // Open the users file to search for the user
   FILE *file = fopen(USERS_FILE, "r");
 
@@ -377,25 +341,12 @@ bool authenticate_user(const char *username, const char *password) {
   return false; // Authentication failed
 }
 
-void display_user(const struct User *self) {
-  // Check if the user structure is valid
-  if (self == NULL) {
-    print_error_message("Invalid user structure");
-    return;
-  }
-
-  // Display the user's information
+void display_user(const struct User *self) {// Display the user's information
   printf("Username: %s\nPassword: %s\n", self->username, self->password);
-  sleep(5); // Wait for 5 seconds
+  sleep(NORMAL_DELAY); // Wait for 5 seconds
 }
 
 void save_user(const struct User *self) {
-  // Check if the user structure is valid
-  if (self == NULL) {
-    print_error_message("Invalid user structure");
-    return;
-  }
-
   // Open the users file in append mode to add the user data
   FILE *file = fopen(USERS_FILE, "a");
 
@@ -428,18 +379,4 @@ void free_user(struct User *self) {
   if (self->password != NULL)
     free(self->password); // Free password memory
   free(self); // Free the User struct itself
-
-  // Set the user attributes to NULL
-  self->username = NULL;
-  self->password = NULL;
-
-  // Set the user methods to NULL
-  self->set_username = NULL;
-  self->set_password = NULL;
-  self->display_user = NULL;
-  self->save_user = NULL;
-  self->free_user = NULL;
-
-  // Set the user structure to NULL
-  self = NULL;
 }

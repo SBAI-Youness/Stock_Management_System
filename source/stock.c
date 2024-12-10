@@ -1,12 +1,6 @@
 #include "../include/stock.h"
 
 void display_product(const struct Product *self) {
-  // Check if the product structure is valid
-  if (self == NULL) {
-    print_error_message("Invalid product structure");
-    return;
-  }
-
   // Display the product's information
   printf("\nProduct Information:\n");
   printf("  Id: %u\n  Name: %s\n  Description: %s\n  Username: %s\n  Unit Price: %.2f\n  Quantity: %u\n  Alert Threshold: %u\n  Last Entry Date: %u/%u/%u\n  Last Exit Date: %u/%u/%u\n",
@@ -19,6 +13,7 @@ void display_product(const struct Product *self) {
           self->alert_threshold,
           self->last_entry_date.day, self->last_entry_date.month, self->last_entry_date.year,
           self->last_exit_date.day, self->last_exit_date.month, self->last_exit_date.year);
+  sleep(NORMAL_DELAY); // Wait for 5 seconds
 }
 
 void save_product(const struct Product *self) {
@@ -72,17 +67,4 @@ void free_product(struct Product *self) {
   if (self->username != NULL)
     free(self->username); // Free username memory
   free(self); // Free the Product struct itself
-
-  // Set the product attributes to NULL
-  self->name = NULL;
-  self->description = NULL;
-  self->username = NULL;
-
-  // Set the product methods to NULL
-  self->display_product = NULL;
-  self->save_product = NULL;
-  self->free_product = NULL;
-
-  // Set the product structure to NULL
-  self = NULL;
 }

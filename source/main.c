@@ -1,12 +1,11 @@
 #include "../include/utils.h"
-#include "../include/users.h"
 
 int main() {
-  size_t choice;
+  size_t menu_choice;
 
   do {
-    display_main_menu(&choice);
-    switch (choice) {
+    display_main_menu(&menu_choice);
+    switch (menu_choice) {
       case 1:
         sign_up();
         break;
@@ -19,7 +18,7 @@ int main() {
       default:
         invalid_choice();
     }
-  } while (choice != 3);
+  } while (menu_choice != 3); // Exit the loop when the user chooses to exit
 
   return EXIT_SUCCESS;
 }

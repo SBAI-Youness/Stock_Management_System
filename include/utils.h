@@ -10,7 +10,13 @@
 #include <ctype.h>
 #include <windows.h>
 
+#include "./users.h"
+#include "./stock.h"
+
 #define PROJECT_NAME "Stock Management System"
+
+#define NORMAL_DELAY 3
+#define NOT_NORMAL_DELAY 5
 
 // Foreground text colors
 #define RESET       "\033[0m"
@@ -30,16 +36,16 @@
 extern void print_project_name();
 
 // Function used to display the main menu
-extern void display_main_menu(size_t *choice);
+extern void display_main_menu(size_t *menu_choice);
 
 // Function used to print success messages
-extern void print_success_message(const char *message);
+extern void print_success_message(const char *success_message);
 
 // Function used to print error messages
-extern void print_error_message(const char *message);
+extern void print_error_message(const char *error_message);
 
 // Function used to log out
-void log_out();
+extern void log_out();
 
 // Function used to exit the program
 extern void exit_program();

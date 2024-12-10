@@ -29,7 +29,7 @@ struct User {
 extern struct User *create_user();
 
 // Function used to set the user methods
-extern void set_user_methods(struct User *self);
+extern void set_user_methods(struct User *user);
 
 // Function used to handle user sign up process
 extern void sign_up();
