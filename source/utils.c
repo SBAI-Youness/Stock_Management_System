@@ -1,6 +1,7 @@
 #include "../include/utils.h"
 
 void print_project_name() {
+  system("cls");
   printf(BLUE BOLD UNDERLINE "\t\t=== Stock Management System ===\n\n" RESET);
 }
 
@@ -11,7 +12,8 @@ void display_main_menu(size_t *menu_choice) {
   printf("2. Login\n");
   printf("3. Exit\n");
   printf(" >> ");
-  scanf("%zu", &(*menu_choice)); // Read the user's choice
+  if (scanf("%zu", &(*menu_choice)) != 1) // Read the user's choice
+    (*menu_choice) = 0; // If the user's choice is not a number, set it to 0
   rewind(stdin); // Clear input buffer
 }
 

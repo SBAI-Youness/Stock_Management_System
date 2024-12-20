@@ -44,23 +44,18 @@ The **Stock Management System** is a console-based application developed in C fo
    ```
 2. Navigate to the project directory:
    ```bash
-   cd build
+   cd ./Stock_Management_System
    ```
 3. Build the project:
    ```bash
    make
    ```
-4. Run the application:
+4. Navigate to the build directory and run the application:
    ```bash
+   cd build
    .\main.exe
    ```
 
-
-## Contributors
-- **Youness SBAI** (Lead Developer)
-- **Yassine HAJIB**
-- **Youssef BENMOUSSA**
-- **Younes SALYM**
 
 ## License
 Stock Management System is released under the MIT License. See the [LICENSE](LICENSE) file for more details.

@@ -27,7 +27,11 @@ $(RESOURCE_OBJ): $(RESOURCE) | $(BUILD)
 $(TARGET): $(SRC) $(RESOURCE_OBJ) | $(BUILD)
 	$(CC) $(CFLAGS) $^ -o $@
 
+# Run the program after building
+run: $(TARGET)
+	@$(TARGET)
+
 clean:
 	rmdir /S /Q $(BUILD)
 
-.PHONY: all clean
+.PHONY: all clean run

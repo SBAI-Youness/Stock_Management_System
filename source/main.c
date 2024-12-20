@@ -1,10 +1,12 @@
 #include "../include/utils.h"
 
 int main() {
-  size_t menu_choice;
+  size_t menu_choice; // Variable to store the user's choice
 
   do {
     display_main_menu(&menu_choice);
+
+    // Switch statement to handle the user's choice
     switch (menu_choice) {
       case 1:
         sign_up();

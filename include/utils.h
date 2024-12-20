@@ -20,13 +20,14 @@
 
 // Foreground text colors
 #define RESET       "\033[0m"
-#define RED         "\033[31m"                // Error
-#define GREEN       "\033[32m"               // Success
-#define YELLOW      "\033[1;33m"            // Exit
-#define ORANGE      "\033[38;5;208m"       // Warning
-#define DARK_GREEN  "\033[38;2;0;102;51m" // Sign up & Log in
-#define BLUE        "\033[34m"           // Project name
-#define CYAN        "\033[1;36m"        // Username
+#define RED         "\033[31m"                     // Error
+#define GREEN       "\033[32m"                    // Success
+#define YELLOW      "\033[1;33m"                 // Exit
+#define ORANGE      "\033[38;5;208m"            // Warning
+#define DARK_GREEN  "\033[38;2;0;102;51m"      // Sign up & Log in
+#define BLUE        "\033[34m"                // Project name
+#define CYAN        "\033[1;36m"             // Username
+#define BROWN       "\033[38;2;139;69;19m"  // Display User
 
 // Text styles
 #define BOLD        "\033[1m"

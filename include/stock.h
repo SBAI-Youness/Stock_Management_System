@@ -6,6 +6,11 @@
 // Path to the CSV file where stock data is stored
 #define STOCK_FILE "../data/stock.csv"
 
+#define MIN_NAME_LENGTH 4
+#define MAX_NAME_LENGTH 16
+#define MIN_DESCRIPTION_LENGTH 8
+#define MAX_DESCRIPTION_LENGTH 64
+
 struct Date {
   uint8_t day;
   uint8_t month;
@@ -30,6 +35,18 @@ struct Product {
   void (*save_product)(const struct Product *self);
   void (*free_product)(struct Product *self);
 };
+
+// Function used to create a new product
+extern struct Product *create_product();
+
+// Function used to set the product's methods
+extern void set_product_methods(struct Product *product);
+
+// Function used to display the product management menu
+extern void product_management_menu(const struct User **user);
+
+// Function used to view products
+extern void view_products();
 
 // Function used to display a product's information
 extern void display_product(const struct Product *self);
