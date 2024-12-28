@@ -68,14 +68,57 @@ void product_management_menu(const struct User **user) {
   } while (menu_choice != 4); // Exit the loop if the user chooses to go back to the user session menu
 }
 
-void view_products() {
-  // TODO: Implement the view products function for the next commit, Yay!!
+struct Product *search_product(const char *name, const char *username) {
+  if (name == NULL || username == NULL) {
+    print_error_message("Invalid input");
+    return NULL;
+  }
+
+  // Open the database file in read mode
+  FILE *file = fopen(STOCK_FILE, "r");
+
+  // Check if the file was opened successfully
+  if (file == NULL) {
+    print_error_message("Failed to open the database file");
+    return NULL;
+  }
+
+  struct Product *temp_product = create_product();
+
+  if (temp_product == NULL) {
+    print_error_message("Failed to create a temporary product");
+    fclose(file);
+    return NULL;
+  }
+
+  // Skip the header line by seeking to the next line
+  fseek(file, strlen("Id,Name,Description,Username,Unit Price(in $),Stock Quantity,Stock Alert Threshold,Last Stock Entry Date,Last Stock Exit Date\n"), SEEK_SET);
+
+  while (fscanf(file, "%hu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
+                &temp_product->id,
+                temp_product->name,
+                temp_product->description,
+                temp_product->username,
+                &temp_product->unit_price,
+                &temp_product->quantity,
+                &temp_product->alert_threshold,
+                &temp_product->last_entry_date.day, &temp_product->last_entry_date.month, &temp_product->last_entry_date.year,
+                &temp_product->last_exit_date.day, &temp_product->last_exit_date.month, &temp_product->last_exit_date.year) != EOF)
+    if (strcmp(temp_product->name, name) == 0 && strcmp(temp_product->username, username) == 0) {
+      // Product found, return the pointer to the product
+      fclose(file);
+      return temp_product;
+    }
+
+  // Product not found, clean up and return NULL
+  fclose(file);
+  temp_product->free_product(temp_product);
+  return NULL;
 }
 
 void display_product(const struct Product *self) {
   // Display the product's information
-  printf("\nProduct Information:\n");
-  printf("  Id: %u\n  Name: %s\n  Description: %s\n  Username: %s\n  Unit Price: %.2f\n  Quantity: %u\n  Alert Threshold: %u\n  Last Entry Date: %u/%u/%u\n  Last Exit Date: %u/%u/%u\n",
+  printf(BROWN BOLD UNDERLINE "Id:" RESET GREEN " %hu\n" BROWN BOLD UNDERLINE "Name:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Description:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Username:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Unit Price:" RESET GREEN " %.2f\n" BROWN BOLD UNDERLINE "Quantity:" RESET GREEN " %u\n" BROWN BOLD UNDERLINE "Alert Threshold:" RESET GREEN " %u\n" BROWN BOLD UNDERLINE "Last Entry Date:" RESET GREEN " %hhu" RESET "/" RESET GREEN "%hhu" RESET "/" RESET GREEN "%hu\n" BROWN BOLD UNDERLINE "Last Exit Date:" RESET GREEN " %hhu" RESET "/" RESET GREEN "%hhu" RESET "/" RESET GREEN "%hu\n" RESET,
           self->id,
           self->name,
           self->description,
@@ -85,7 +128,6 @@ void display_product(const struct Product *self) {
           self->alert_threshold,
           self->last_entry_date.day, self->last_entry_date.month, self->last_entry_date.year,
           self->last_exit_date.day, self->last_exit_date.month, self->last_exit_date.year);
-  sleep(NORMAL_DELAY); // Wait for 5 seconds
 }
 
 void save_product(const struct Product *self) {
@@ -111,7 +153,7 @@ void save_product(const struct Product *self) {
     fprintf(file, "Id,Name,Description,Username,Unit Price,Stock Quantity,Stock Alert Threshold,Last Stock Entry Date,Last Stock Exit Date\n"); // Write headers
 
   // Write product data to the file
-  fprintf(file, "%u,%s,%s,%s,%.2f,%u,%u,%u/%u/%u,%u/%u/%u\n",
+  fprintf(file, "%hu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
           self->id,
           self->name,
           self->description,

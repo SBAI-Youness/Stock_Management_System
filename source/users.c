@@ -134,11 +134,11 @@ void user_session(const struct User *user) {
       session_choice = 0; // If the user's choice is not a number, set it to 0
     rewind(stdin); // Clear input buffer
 
-
     // Perform the action based on the user's choice
     switch (session_choice) {
       case 1:
         user->display_user(user);
+        system("pause");
         break;
       case 2:
         // Add, Modify or delete a product
@@ -148,7 +148,16 @@ void user_session(const struct User *user) {
         // View all products in the database
         break;
       case 4:
-        // Search for a product by its name and username
+        struct Product *product = search_product("Iphone 16", "youness_sbai");
+        if (product == NULL) {
+          printf(ORANGE "Product not found.\n" RESET);
+          sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
+          break;
+        }
+
+        product->display_product(product);
+        system("pause");
+        product->free_product(product);
         break;
       case 5:
         // Sort products by name and unit price
@@ -188,6 +197,14 @@ void set_username(struct User *self) {
     // Sanitize input by removing traling newline
     size_t length = strcspn(temp_username, "\n");
     temp_username[length] = '\0';
+
+    if (strcmp(temp_username, "Username") == 0) {
+      printf(ORANGE "You can't use this username.\n" RESET);
+      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
+      printf("\033[A\033[2K");
+      printf("\033[A\033[2K");
+      continue;
+    }
 
     // Check the username length
     if (length < MIN_USERNAME_LENGTH || length > MAX_USERNAME_LENGTH) {
@@ -334,7 +351,7 @@ bool is_username_taken(const char *username) {
 
   char tempUsername[MAX_USERNAME_LENGTH];
   while (fscanf(file, "%16[^,],%*s\n", tempUsername) == 1)
-    if (strcmp(tempUsername, username) == 0 && strcmp(tempUsername, "Username") != 0) {
+    if (strcmp(tempUsername, username) == 0) {
       fclose(file);
       return true; // Username is already taken
     }
@@ -376,7 +393,6 @@ bool authenticate_user(const char *username, const char *password) {
 
 void display_user(const struct User *self) {// Display the user's information
   printf(BROWN BOLD UNDERLINE "Username:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Password:" RESET GREEN " %s\n" RESET, self->username, self->password);
-  sleep(NORMAL_DELAY); // Wait for 5 seconds
 }
 
 void save_user(const struct User *self) {

@@ -1,3 +1,4 @@
 Id,Name,Description,Username,Unit Price(in $),Stock Quantity,Stock Alert Threshold,Last Stock Entry Date,Last Stock Exit Date
-123456,Iphone 12,The best phone ever,amine_bounya,1200,100,10,2020/01/01,2020/01/01
-123457,Iphone 13,The best phone ever,youness_sbai,1300,100,10,2020/04/04,2020/04/04
+12456,Iphone 16,This is the latest iphone,youness_sbai,1500,1000,90,19/10/2024,12/12/2024
+53242,Dell Inspiron439,This laptop has touch screen,amine_bounya,900,400,20,9/10/2023,1/12/2024
+12345,Toyota Corrola,This is a good car,oussama_el_arif,7000,150,10,20/12/2022,26/12/2024

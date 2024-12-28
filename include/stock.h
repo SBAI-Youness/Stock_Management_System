@@ -11,6 +11,11 @@
 #define MIN_DESCRIPTION_LENGTH 8
 #define MAX_DESCRIPTION_LENGTH 64
 
+/*
+  uint8_t: 1 byte = 8 bits (0 to 255) => Format specifier: %hhu
+  uint16_t: 1 byte = 16 bits (0 to 65,535) => Format specifier: %hu
+*/
+
 struct Date {
   uint8_t day;
   uint8_t month;
@@ -20,7 +25,7 @@ struct Date {
 // Product structure with attributes and methods (function pointers)
 struct Product {
   //* Attributes
-  uint8_t id;
+  uint16_t id;
   char *name;
   char *description;
   char *username;
@@ -30,7 +35,7 @@ struct Product {
   struct Date last_entry_date;
   struct Date last_exit_date;
 
-  ///* Methods
+  //* Methods
   void (*display_product)(const struct Product *self);
   void (*save_product)(const struct Product *self);
   void (*free_product)(struct Product *self);
@@ -45,8 +50,8 @@ extern void set_product_methods(struct Product *product);
 // Function used to display the product management menu
 extern void product_management_menu(const struct User **user);
 
-// Function used to view products
-extern void view_products();
+// Function used to search for a product by its name and username
+extern struct Product *search_product(const char *name, const char *username);
 
 // Function used to display a product's information
 extern void display_product(const struct Product *self);
