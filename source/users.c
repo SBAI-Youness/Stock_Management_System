@@ -136,20 +136,25 @@ void user_session(const struct User *user) {
 
     // Perform the action based on the user's choice
     switch (session_choice) {
-      case 1:
+      case 1: // Display the user's information (username & password)
         user->display_user(user);
         system("pause");
         break;
-      case 2:
-        // Add, Modify or delete a product
-        product_management_menu(&user);
+      case 2: // Add, Modify or delete a product
+        product_management_menu(*user);
         break;
-      case 3:
-        // View all products in the database
+      case 3: // View all products in the database
         break;
       case 4:
-        struct Product *product = search_product("Iphone 16", "youness_sbai");
-        if (product == NULL) {
+        print_project_name();
+        printf(DARK_GREEN UNDERLINE "\t--- Search Products ---\n\n" RESET);
+
+        // Create a new product
+        struct Product *product = create_product();
+        product->set_name(product);
+
+        //  Search for the product in the database
+        if ((product = search_product(product->name, user->username)) == NULL) {
           printf(ORANGE "Product not found.\n" RESET);
           sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
           break;
@@ -191,7 +196,10 @@ void set_username(struct User *self) {
     // Use secure input reading with size limit
     if (fgets(temp_username, MAX_USERNAME_LENGTH, stdin) == NULL) {
       print_error_message("Failed to read username"); // Handle input error
-      return;
+      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
+      printf("\033[A\033[2K");
+      printf("\033[A\033[2K");
+      continue;
     }
 
     // Sanitize input by removing traling newline
@@ -277,7 +285,10 @@ void set_password(struct User *self) {
     // Use secure input reading with size limit
     if (fgets(temp_password, MAX_PASSWORD_LENGTH, stdin) == NULL) {
       print_error_message("Failed to read password"); // Handle input error
-      return;
+      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
+      printf("\033[A\033[2K");
+      printf("\033[A\033[2K");
+      continue;
     }
 
     // Sanitize input by removing trailing newline

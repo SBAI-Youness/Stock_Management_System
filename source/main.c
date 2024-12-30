@@ -3,6 +3,8 @@
 int main() {
   size_t menu_choice; // Variable to store the user's choice
 
+  srand(time(NULL)); // Seed the random number generator
+
   do {
     display_main_menu(&menu_choice);
 
