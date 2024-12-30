@@ -63,7 +63,7 @@ void product_management_menu(const struct User user) {
         // Modify a product
         break;
       case 3:
-        // Delete a product
+        delete_product(user);
         break;
       case 4:
         break;
@@ -472,6 +472,185 @@ void set_current_date(struct Date *date) {
   date->year = tm.tm_year + 1900; // tm_year is years since 1900
 }
 
+void delete_product(const struct User user) {
+  // Open the database file in read mode
+  FILE *file = fopen(STOCK_FILE, "r");
+
+  // Check if the file was opened successfully
+  if (file == NULL) {
+    print_error_message("Failed to open the stock file");
+    return;
+  }
+
+  print_project_name();
+  printf(DARK_GREEN UNDERLINE "\t--- Delete Product ---\n\n" RESET);
+
+  // Create a new product
+  struct Product *product = create_product();
+
+  // Check if the product was created successfully
+  if (product == NULL) {
+    print_error_message("Failed to create a new product");
+    fclose(file);
+    return;
+  }
+
+  // Set the product's name
+  product->set_name(product);
+
+  // Read the entire file into memory
+  fseek(file, 0, SEEK_END);
+  long file_size = ftell(file);
+  fseek(file, 0, SEEK_SET);
+
+  // Allocate memory for the file contents
+  char *file_contents = (char *) malloc(file_size + 1);
+
+  // Check if memory allocation was successful
+  if (file_contents == NULL) {
+    print_error_message("Failed to allocate memory for file contents");
+    fclose(file);
+    return;
+  }
+
+  fread(file_contents, 1, file_size, file);
+  file_contents[file_size] = '\0';
+  fclose(file);
+
+  // Open the file in write mode to overwrite it
+  file = fopen(STOCK_FILE, "w");
+
+  // Check if the file was opened successfully
+  if (file == NULL) {
+    print_error_message("Failed to open the stock file in write mode");
+    free(file_contents);
+    return;
+  }
+
+  // Write the header to the file
+  fprintf(file, STOCK_HEADER_FILE);
+
+  bool product_found = false; // Flag to check if the product was found in the file or not
+  struct Product *temp_product = create_product(); // Create a temporary product structure
+
+  // Check if the temporary product was created successfully
+  if (temp_product == NULL) {
+    print_error_message("Failed to create a temporary product structure");
+    free(file_contents);
+    fclose(file);
+    return;
+  }
+
+  // Parse the file contents and write back all products except the one to be deleted
+  char *line = strtok(file_contents, "\n");
+  while (line != NULL) {
+    if (sscanf(line, "%hu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu",
+               &temp_product->id,
+               temp_product->name,
+               temp_product->description,
+               temp_product->username,
+               &temp_product->unit_price,
+               &temp_product->quantity,
+               &temp_product->alert_threshold,
+               &temp_product->last_entry_date.day, &temp_product->last_entry_date.month, &temp_product->last_entry_date.year,
+               &temp_product->last_exit_date.day, &temp_product->last_exit_date.month, &temp_product->last_exit_date.year) == 13) {
+      // If the current product's name matches the one to delete, skip writing it to the file
+      if (strcmp(temp_product->name, product->name) == 0 && strcmp(temp_product->username, user.username) == 0)
+        product_found = true;
+      else {
+        // Write the current product to the file
+        fprintf(file, "%hu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
+                      temp_product->id,
+                      temp_product->name,
+                      temp_product->description,
+                      temp_product->username,
+                      temp_product->unit_price,
+                      temp_product->quantity,
+                      temp_product->alert_threshold,
+                      temp_product->last_entry_date.day, temp_product->last_entry_date.month, temp_product->last_entry_date.year,
+                      temp_product->last_exit_date.day, temp_product->last_exit_date.month, temp_product->last_exit_date.year);
+      }
+    }
+    line = strtok(NULL, "\n");
+  }
+
+  // Close the file
+  fclose(file);
+
+  // Free the allocated memory for the product and file contents
+  temp_product->free_product(temp_product);
+  product->free_product(product);
+  free(file_contents);
+
+  if (product_found)
+    print_success_message("Product deleted successfully");
+  else {
+    printf(ORANGE "Product not found in the stock file" RESET);
+    sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
+  }
+}
+
+void view_products(const struct User user) {
+  // Open the database file in read mode
+  FILE *file = fopen(STOCK_FILE, "r");
+
+  // Check if the file was opened successfully
+  if (file == NULL) {
+    print_error_message("Failed to open the stock file");
+    return;
+  }
+
+  print_project_name();
+  printf(DARK_GREEN UNDERLINE "\t--- View Products ---\n\n" RESET);
+
+  // Read the header line
+  fseek(file, strlen(STOCK_HEADER_FILE), SEEK_SET);
+
+  bool found_products = false; // Flag to check if any products are displayed
+
+  // Create a temporary product structure
+  struct Product *temp_product = create_product();
+
+  // Check if the temporary product was created successfully
+  if (temp_product == NULL) {
+    print_error_message("Failed to create a temporary product");
+    fclose(file);
+    return;
+  }
+
+  // Read the file line by line and display the products
+  while (fscanf(file, "%hu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
+                &temp_product->id,
+                temp_product->name,
+                temp_product->description,
+                temp_product->username,
+                &temp_product->unit_price,
+                &temp_product->quantity,
+                &temp_product->alert_threshold,
+                &temp_product->last_entry_date.day, &temp_product->last_entry_date.month, &temp_product->last_entry_date.year,
+                &temp_product->last_exit_date.day, &temp_product->last_exit_date.month, &temp_product->last_exit_date.year) != EOF)
+    // Check if the product belongs to the current user
+    if (strcmp(temp_product->username, user.username) == 0) {
+      if (found_products == false)
+        printf("--------------------------------------------------------------------\n");
+      found_products = true; // Mark that products were found
+      display_product(temp_product);
+      printf("--------------------------------------------------------------------\n");
+    }
+
+  // Check if no products were found
+  if (found_products == false) {
+    printf(ORANGE "No products found.\n" RESET);
+    sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
+  }
+  else
+    system("pause");
+
+  // Close the file & free the temporary product
+  fclose(file);
+  temp_product->free_product(temp_product);
+}
+
 struct Product *search_product(const char *name, const char *username) {
   if (name == NULL || username == NULL) {
     print_error_message("Invalid input");
@@ -496,7 +675,7 @@ struct Product *search_product(const char *name, const char *username) {
   }
 
   // Skip the header line by seeking to the next line
-  fseek(file, strlen("Id,Name,Description,Username,Unit Price(in $),Stock Quantity,Stock Alert Threshold,Last Stock Entry Date,Last Stock Exit Date\n"), SEEK_SET);
+  fseek(file, strlen(STOCK_HEADER_FILE), SEEK_SET);
 
   while (fscanf(file, "%hu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
                 &temp_product->id,
@@ -554,7 +733,7 @@ void save_product(const struct Product *self) {
   fseek(file, 0, SEEK_END); // Move to the end of the file
   long file_size = ftell(file); // Get file size
   if (file_size == 0)
-    fprintf(file, "Id,Name,Description,Username,Unit Price,Stock Quantity,Stock Alert Threshold,Last Stock Entry Date,Last Stock Exit Date\n"); // Write headers
+    fprintf(file, STOCK_HEADER_FILE); // Write headers
 
   // Write product data to the file
   fprintf(file, "%hu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",

@@ -6,6 +6,9 @@
 // Path to the CSV file where stock data is stored
 #define STOCK_FILE "../data/stock.csv"
 
+// Header line for the stock file
+#define STOCK_HEADER_FILE "Id,Name,Description,Username,Unit Price(in $),Stock Quantity,Stock Alert Threshold,Last Stock Entry Date,Last Stock Exit Date\n"
+
 #define MIN_NAME_LENGTH 4
 #define MAX_NAME_LENGTH 16
 #define MIN_DESCRIPTION_LENGTH 8
@@ -99,6 +102,12 @@ extern bool is_alert_threshold_valid(size_t threshold, size_t quantity);
 
 // Function used to set a Date structure to the current date
 extern void set_current_date(struct Date *date);
+
+// Function used to delete a product
+extern void delete_product(const struct User user);
+
+// Function used to view the products in the stock
+extern void view_products(const struct User user);
 
 // Function used to search for a product by its name and username
 extern struct Product *search_product(const char *name, const char *username);

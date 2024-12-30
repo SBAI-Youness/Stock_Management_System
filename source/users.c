@@ -144,6 +144,7 @@ void user_session(const struct User *user) {
         product_management_menu(*user);
         break;
       case 3: // View all products in the database
+        view_products(*user);
         break;
       case 4:
         print_project_name();
@@ -153,7 +154,7 @@ void user_session(const struct User *user) {
         struct Product *product = create_product();
         product->set_name(product);
 
-        //  Search for the product in the database
+        // Search for the product in the database
         if ((product = search_product(product->name, user->username)) == NULL) {
           printf(ORANGE "Product not found.\n" RESET);
           sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
@@ -420,7 +421,7 @@ void save_user(const struct User *self) {
   fseek(file, 0, SEEK_END); // Move to the end of the file
   long file_size = ftell(file); // Get file size
   if (file_size == 0)
-    fprintf(file, "Username,Password\n"); // Write headers
+    fprintf(file, USERS_HEADER_FILE); // Write headers
 
   // Write username and password to the file
   fprintf(file, "%s,%s\n", self->username, self->password);

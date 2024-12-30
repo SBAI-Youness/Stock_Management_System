@@ -6,6 +6,9 @@
 // Path to the CSV file where user data is stored
 #define USERS_FILE "../data/users.csv"
 
+// Header line for the users file
+#define USERS_HEADER_FILE "Username,Password\n"
+
 #define MIN_USERNAME_LENGTH 4
 #define MAX_USERNAME_LENGTH 16
 #define MIN_PASSWORD_LENGTH 6
