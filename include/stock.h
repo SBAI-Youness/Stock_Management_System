@@ -112,6 +112,12 @@ extern void view_products(const struct User user);
 // Function used to search for a product by its name and username
 extern struct Product *search_product(const char *name, const char *username);
 
+// Function used to sort the database by name
+extern void sort_products_by_name(const struct User user);
+
+// Function used to compare products by name
+extern int compare_products_by_name(const void *a, const void *b);
+
 // Function used to display a product's information
 extern void display_product(const struct Product *self);
 

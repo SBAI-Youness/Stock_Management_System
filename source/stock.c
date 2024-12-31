@@ -699,6 +699,92 @@ struct Product *search_product(const char *name, const char *username) {
   return NULL;
 }
 
+int compare_products_by_name(const void *a, const void *b) {
+  struct Product *product_a = *(struct Product **)a,
+                 *product_b = *(struct Product **)b;
+
+  // Compare the names of the products
+  return strcmp(product_a->name, product_b->name);
+}
+
+void sort_products_by_name(const struct User user) {
+  // Open the database file in read mode
+  FILE *file = fopen(STOCK_FILE, "r");
+
+  // Check if the file was opened successfully
+  if (file == NULL) {
+    print_error_message("Failed to open the stock file in read mode");
+    return;
+  }
+
+  // Skip the header line
+  fseek(file, strlen(STOCK_HEADER_FILE), SEEK_SET);
+
+  // Create a dynamic array to store the products
+  struct Product **products = NULL;
+  size_t product_count = 0;
+
+  // Read the products from the file
+  struct Product *temp_product = create_product();
+  while (fscanf(file, "%hu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
+                &temp_product->id,
+                temp_product->name,
+                temp_product->description,
+                temp_product->username,
+                &temp_product->unit_price,
+                &temp_product->quantity,
+                &temp_product->alert_threshold,
+                &temp_product->last_entry_date.day, &temp_product->last_entry_date.month, &temp_product->last_entry_date.year,
+                &temp_product->last_exit_date.day, &temp_product->last_exit_date.month, &temp_product->last_exit_date.year) != EOF) {
+    products = realloc(products, (product_count + 1) * sizeof(struct Product *));
+    products[product_count] = temp_product;
+    product_count++;
+    temp_product = create_product();
+  }
+
+  // Close the file
+  fclose(file);
+
+  // Sort the products by name
+  qsort(products, product_count, sizeof(struct Product *), compare_products_by_name);
+
+  // Open the file in write mode to overwrite it
+  file = fopen(STOCK_FILE, "w");
+
+  // Check if the file was opened successfully
+  if (file == NULL) {
+    print_error_message("Failed to open the stock file in write mode");
+    for (size_t i = 0; i < product_count; i++)
+      products[i]->free_product(products[i]);
+    free(products);
+    return;
+  }
+
+  // Write the header to the file
+  fprintf(file, STOCK_HEADER_FILE);
+
+  // Write the sorted products to the file
+  for (size_t i = 0; i < product_count; i++) {
+    fprintf(file, "%hu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
+            products[i]->id,
+            products[i]->name,
+            products[i]->description,
+            products[i]->username,
+            products[i]->unit_price,
+            products[i]->quantity,
+            products[i]->alert_threshold,
+            products[i]->last_entry_date.day, products[i]->last_entry_date.month, products[i]->last_entry_date.year,
+            products[i]->last_exit_date.day, products[i]->last_exit_date.month, products[i]->last_exit_date.year);
+    products[i]->free_product(products[i]);
+  }
+
+  // Close the file and free the allocated memory
+  fclose(file);
+  free(products);
+
+  print_success_message("Products sorted by name successfully");
+}
+
 void display_product(const struct Product *self) {
   // Display the product's information
   printf(BROWN BOLD UNDERLINE "Id:" RESET GREEN " %hu\n" BROWN BOLD UNDERLINE "Name:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Description:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Username:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Unit Price:" RESET GREEN " %.2f\n" BROWN BOLD UNDERLINE "Quantity:" RESET GREEN " %u\n" BROWN BOLD UNDERLINE "Alert Threshold:" RESET GREEN " %u\n" BROWN BOLD UNDERLINE "Last Entry Date:" RESET GREEN " %hhu" RESET "/" RESET GREEN "%hhu" RESET "/" RESET GREEN "%hu\n" BROWN BOLD UNDERLINE "Last Exit Date:" RESET GREEN " %hhu" RESET "/" RESET GREEN "%hhu" RESET "/" RESET GREEN "%hu\n" RESET,

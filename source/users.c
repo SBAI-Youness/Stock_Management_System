@@ -167,6 +167,7 @@ void user_session(const struct User *user) {
         break;
       case 5:
         // Sort products by name and unit price
+        sort_products_by_name(*user);
         break;
       case 6:
         log_out();
