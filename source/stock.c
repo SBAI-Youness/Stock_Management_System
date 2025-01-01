@@ -103,8 +103,7 @@ void add_product(const struct User user) {
     if (search_product(new_product->name, new_product->username) == NULL)
       isUnique = true;
     else {
-      printf(ORANGE "Product's name is already taken. Please choose a different name.\n" RESET);
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
+      print_warning_message("Product's name is already taken. Please choose a different name.");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
     }
@@ -190,7 +189,6 @@ void set_name(struct Product *self) {
     // Use secure input reading with size limit
     if (fgets(temp_name, MAX_NAME_LENGTH, stdin) == NULL) {
       print_error_message("Failed to read name"); // Handle input error
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -201,8 +199,7 @@ void set_name(struct Product *self) {
     temp_name[length] = '\0';
 
     if (strcmp(temp_name, "Name") == 0) {
-      printf(ORANGE "You can't use this name.\n" RESET);
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
+      print_warning_message("You can't use this name.");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -210,8 +207,7 @@ void set_name(struct Product *self) {
 
     // Check the name length
     if (length < MIN_NAME_LENGTH || length > MAX_NAME_LENGTH) {
-      printf(ORANGE "Name must be between %d and %d characters long.\n" RESET, MIN_NAME_LENGTH, MAX_NAME_LENGTH);
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
+      print_warning_message("Name must be between %d and %d characters long", MIN_NAME_LENGTH, MAX_NAME_LENGTH);
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -219,8 +215,7 @@ void set_name(struct Product *self) {
 
     // Check if the name is valid (no special characters)
     if (is_name_valid(temp_name) == false) {
-      printf(ORANGE "Name can only contain alphanumeric characters, maximum 2 dashes and 2 spaces, and must include at least one alphanumeric character.\n" RESET);
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
+      print_warning_message("Name can only contain alphanumeric characters, maximum 2 dashes and 2 spaces, and must include at least one alphanumeric character");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -287,7 +282,6 @@ void set_description(struct Product *self) {
     // Use secure input reading with size limit
     if (fgets(temp_description, MAX_DESCRIPTION_LENGTH, stdin) == NULL) {
       print_error_message("Failed to read description"); // Handle input error
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -298,8 +292,7 @@ void set_description(struct Product *self) {
     temp_description[length] = '\0';
 
     if (length < MIN_DESCRIPTION_LENGTH || length > MAX_DESCRIPTION_LENGTH) {
-      printf(ORANGE "Description must be between %d and %d characters long.\n" RESET, MIN_DESCRIPTION_LENGTH, MAX_DESCRIPTION_LENGTH);
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
+      print_warning_message("Description must be between %d and %d characters long", MIN_DESCRIPTION_LENGTH, MAX_DESCRIPTION_LENGTH);
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -307,8 +300,7 @@ void set_description(struct Product *self) {
 
     // Check if the description is valid
     if (is_description_valid(temp_description) == false) {
-      printf(ORANGE "Description can only contain characters (alphanumeric and spaces).\n" RESET);
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
+      print_warning_message("Description can only contain characters (alphanumeric and spaces).");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -353,7 +345,6 @@ void set_unit_price(struct Product *self) {
     // Read the unit price from the user
     if (scanf("%f", &price) != 1) {
       print_error_message("Invalid input. Please enter a valid number");
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -361,8 +352,7 @@ void set_unit_price(struct Product *self) {
 
     // Validate the unit price
     if (is_unit_price_valid(price) == false) {
-      printf(ORANGE "Unit price must be a strict positive number.\n" RESET);
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
+      print_warning_message("Unit price must be a strict positive number");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -403,8 +393,7 @@ void set_quantity(struct Product *self) {
 
     // Validate the quantity
     if (is_quantity_valid(quantity) == false) {
-      print_error_message("quantity cannot be negative");
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
+      print_error_message("Quantity must be a strict positive number");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -446,7 +435,6 @@ void set_alert_threshold(struct Product *self) {
     // Validate the alert threshold
     if (is_alert_threshold_valid(threshold, self->quantity) == false) {
       print_error_message("Alert threshold must be a strict positive number and should be less than the quantity");
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -584,10 +572,8 @@ void delete_product(const struct User user) {
 
   if (product_found)
     print_success_message("Product deleted successfully");
-  else {
-    printf(ORANGE "Product not found in the stock file" RESET);
-    sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
-  }
+  else
+    print_error_message("Product not found in the stock file");
 }
 
 void view_products(const struct User user) {

@@ -58,8 +58,7 @@ void sign_up() {
     if (is_username_taken(user->username) == false)
       isUnique = true;
     else {
-      printf(ORANGE "Username is already taken. Please choose a different username.\n" RESET);
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
+      print_warning_message("Username is already taken. Please choose a different username");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
     }
@@ -101,8 +100,7 @@ void log_in() {
       isAuthenticated = true;
     }
     else {
-      printf(ORANGE "Invalid username or password. Please try again.\n" RESET);
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
+      print_warning_message("Invalid username or password. Please try again");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
@@ -156,8 +154,7 @@ void user_session(const struct User *user) {
 
         // Search for the product in the database
         if ((product = search_product(product->name, user->username)) == NULL) {
-          printf(ORANGE "Product not found.\n" RESET);
-          sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
+          print_warning_message("Product not found");
           break;
         }
 
@@ -198,7 +195,6 @@ void set_username(struct User *self) {
     // Use secure input reading with size limit
     if (fgets(temp_username, MAX_USERNAME_LENGTH, stdin) == NULL) {
       print_error_message("Failed to read username"); // Handle input error
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -209,8 +205,7 @@ void set_username(struct User *self) {
     temp_username[length] = '\0';
 
     if (strcmp(temp_username, "Username") == 0) {
-      printf(ORANGE "You can't use this username.\n" RESET);
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
+      print_warning_message("You can't use this username");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -218,8 +213,7 @@ void set_username(struct User *self) {
 
     // Check the username length
     if (length < MIN_USERNAME_LENGTH || length > MAX_USERNAME_LENGTH) {
-      printf(ORANGE "Username must be between %d and %d characters long.\n" RESET, MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH);
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
+      print_warning_message("Username must be between %d and %d characters long", MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH);
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -227,8 +221,7 @@ void set_username(struct User *self) {
 
     // Check if the username is valid (no spaces or special characters)
     if (is_username_valid(temp_username) == false) {
-      printf(ORANGE "Username can only contain alphanumeric characters and maximum 2 underscores, and must include at least one alphanumeric character.\n" RESET);
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
+      print_warning_message("Username can only contain alphanumeric characters and maximum 2 underscores, and must include at least one alphanumeric character");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -287,7 +280,6 @@ void set_password(struct User *self) {
     // Use secure input reading with size limit
     if (fgets(temp_password, MAX_PASSWORD_LENGTH, stdin) == NULL) {
       print_error_message("Failed to read password"); // Handle input error
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 secondes
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -299,8 +291,7 @@ void set_password(struct User *self) {
 
     // Check password length
     if (length < MIN_PASSWORD_LENGTH || length > MAX_PASSWORD_LENGTH) {
-      printf(ORANGE "Password must be between %d and %d characters long.\n" RESET, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH);
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
+      print_warning_message("Password must be between %d and %d characters long", MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH);
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -308,8 +299,7 @@ void set_password(struct User *self) {
 
     // Check if the password contains at least one uppercase letter, one lowercase letter, and one digit
     if (is_password_valid(temp_password) == false) {
-      printf(ORANGE "Password must contain at least 3 of the following requirements: uppercase letter, one lowercase letter, one special character, and one digit.\n" RESET);
-      sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
+      print_warning_message("Password must contain at least one uppercase letter, one lowercase letter, and one digit");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;

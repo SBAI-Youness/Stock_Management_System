@@ -43,6 +43,9 @@ extern void display_main_menu(size_t *menu_choice);
 // Function used to print success messages
 extern void print_success_message(const char *success_message);
 
+// Function used to print warning messages
+extern void print_warning_message(const char *format, ...);
+
 // Function used to print error messages
 extern void print_error_message(const char *error_message);
 

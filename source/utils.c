@@ -22,6 +22,16 @@ void print_success_message(const char *success_message) {
   sleep(NORMAL_DELAY); // Wait for 3 seconds
 }
 
+void print_warning_message(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    printf(ORANGE "Warning: ");
+    vprintf(format, args);
+    printf("!\n" RESET);
+    va_end(args);
+    sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
+}
+
 void print_error_message(const char *error_message) {
   fprintf(stderr, RED "Error: %s!\n" RESET, error_message);
   sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
@@ -40,6 +50,5 @@ void exit_program() {
 }
 
 void invalid_choice() {
-  printf(ORANGE "Invalid choice. Please try again.\n" RESET);
-  sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
+  print_warning_message("Invalid choice. Please try again");
 }
