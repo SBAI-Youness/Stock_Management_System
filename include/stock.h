@@ -1,5 +1,4 @@
-#ifndef STOCK_H
-#define STOCK_H
+#pragma once
 
 #include "./utils.h"
 
@@ -13,11 +12,6 @@
 #define MAX_NAME_LENGTH 16
 #define MIN_DESCRIPTION_LENGTH 8
 #define MAX_DESCRIPTION_LENGTH 64
-
-/*
-  uint8_t: 1 byte = 8 bits (0 to 255) => Format specifier: %hhu
-  uint16_t: 1 byte = 16 bits (0 to 65535) => Format specifier: %hu
-*/
 
 struct Date {
   uint8_t day;
@@ -56,10 +50,10 @@ extern struct Product *create_product();
 extern void set_product_methods(struct Product *product);
 
 // Function used to display the product management menu
-extern void product_management_menu(const struct User user);
+extern void product_management_menu(const struct User *user);
 
 // Function used to add a product
-extern void add_product(const struct User user);
+extern void add_product(const struct User *user);
 
 // Function used to generate a unique id for a product
 extern uint16_t generate_unique_product_id();
@@ -104,16 +98,16 @@ extern bool is_alert_threshold_valid(size_t threshold, size_t quantity);
 extern void set_current_date(struct Date *date);
 
 // Function used to delete a product
-extern void delete_product(const struct User user);
+extern void delete_product(const struct User *user);
 
 // Function used to view the products in the stock
-extern void view_products(const struct User user);
+extern void view_products(const struct User *user);
 
 // Function used to search for a product by its name and username
 extern struct Product *search_product(const char *name, const char *username);
 
 // Function used to sort the database by name
-extern void sort_products_by_name(const struct User user);
+extern void sort_products_by_name(const struct User *user);
 
 // Function used to compare products by name
 extern int compare_products_by_name(const void *a, const void *b);
@@ -126,5 +120,3 @@ extern void save_product(const struct Product *self);
 
 // Function used to free the memory allocated for a product
 extern void free_product(struct Product *self);
-
-#endif

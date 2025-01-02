@@ -57,11 +57,8 @@ void sign_up() {
     // Check if the username is unique
     if (is_username_taken(user->username) == false)
       isUnique = true;
-    else {
+    else
       print_warning_message("Username is already taken. Please choose a different username");
-      printf("\033[A\033[2K");
-      printf("\033[A\033[2K");
-    }
   }
 
   // Set the user's password
@@ -99,12 +96,8 @@ void log_in() {
       print_success_message("User successfully logged in");
       isAuthenticated = true;
     }
-    else {
+    else
       print_warning_message("Invalid username or password. Please try again");
-      printf("\033[A\033[2K");
-      printf("\033[A\033[2K");
-      printf("\033[A\033[2K");
-    }
   }
 
   // Display the user's information
@@ -139,10 +132,10 @@ void user_session(const struct User *user) {
         system("pause");
         break;
       case 2: // Add, Modify or delete a product
-        product_management_menu(*user);
+        product_management_menu(user);
         break;
       case 3: // View all products in the database
-        view_products(*user);
+        view_products(user);
         break;
       case 4:
         print_project_name();
@@ -164,7 +157,7 @@ void user_session(const struct User *user) {
         break;
       case 5:
         // Sort products by name and unit price
-        sort_products_by_name(*user);
+        sort_products_by_name(user);
         break;
       case 6:
         log_out();

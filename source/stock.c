@@ -40,7 +40,7 @@ void set_product_methods(struct Product *product) {
   product->free_product = free_product;
 }
 
-void product_management_menu(const struct User user) {
+void product_management_menu(const struct User *user) {
   size_t menu_choice; // Variable to store the user's choice
 
   do {
@@ -73,7 +73,7 @@ void product_management_menu(const struct User user) {
   } while (menu_choice != 4); // Exit the loop if the user chooses to go back to the user session menu
 }
 
-void add_product(const struct User user) {
+void add_product(const struct User *user) {
   // Create a new product
   struct Product *new_product = create_product();
 
@@ -84,6 +84,7 @@ void add_product(const struct User user) {
   }
 
   // Generate a unique product ID
+  //! ERROR: comparison is always true due to limited range of data type (0-65535)
   if ((new_product->id = generate_unique_product_id()) > 65535) {
     print_error_message("Failed to add a new product (Not enough space)");
     new_product->free_product(new_product);
@@ -91,7 +92,7 @@ void add_product(const struct User user) {
   }
 
   // Set the product's name automatically
-  strcpy(new_product->username, user.username);
+  strcpy(new_product->username, user->username);
 
   bool isUnique = false; // Flag to check if the product name is unique ot not
   while (isUnique == false) {
@@ -102,11 +103,8 @@ void add_product(const struct User user) {
     // Check if the product's name is unique
     if (search_product(new_product->name, new_product->username) == NULL)
       isUnique = true;
-    else {
-      print_warning_message("Product's name is already taken. Please choose a different name.");
-      printf("\033[A\033[2K");
-      printf("\033[A\033[2K");
-    }
+    else
+      print_warning_message("Product's name is already taken. Please choose a different name");
   }
 
   // Set the description of the product
@@ -199,7 +197,7 @@ void set_name(struct Product *self) {
     temp_name[length] = '\0';
 
     if (strcmp(temp_name, "Name") == 0) {
-      print_warning_message("You can't use this name.");
+      print_warning_message("You can't use this name");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -300,7 +298,7 @@ void set_description(struct Product *self) {
 
     // Check if the description is valid
     if (is_description_valid(temp_description) == false) {
-      print_warning_message("Description can only contain characters (alphanumeric and spaces).");
+      print_warning_message("Description can only contain characters (alphanumeric and spaces)");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -460,7 +458,7 @@ void set_current_date(struct Date *date) {
   date->year = tm.tm_year + 1900; // tm_year is years since 1900
 }
 
-void delete_product(const struct User user) {
+void delete_product(const struct User *user) {
   // Open the database file in read mode
   FILE *file = fopen(STOCK_FILE, "r");
 
@@ -543,7 +541,7 @@ void delete_product(const struct User user) {
                &temp_product->last_entry_date.day, &temp_product->last_entry_date.month, &temp_product->last_entry_date.year,
                &temp_product->last_exit_date.day, &temp_product->last_exit_date.month, &temp_product->last_exit_date.year) == 13) {
       // If the current product's name matches the one to delete, skip writing it to the file
-      if (strcmp(temp_product->name, product->name) == 0 && strcmp(temp_product->username, user.username) == 0)
+      if (strcmp(temp_product->name, product->name) == 0 && strcmp(temp_product->username, user->username) == 0)
         product_found = true;
       else {
         // Write the current product to the file
@@ -570,13 +568,13 @@ void delete_product(const struct User user) {
   product->free_product(product);
   free(file_contents);
 
-  if (product_found)
+  if (product_found == true)
     print_success_message("Product deleted successfully");
   else
-    print_error_message("Product not found in the stock file");
+    print_warning_message("Product not found in the stock file");
 }
 
-void view_products(const struct User user) {
+void view_products(const struct User *user) {
   // Open the database file in read mode
   FILE *file = fopen(STOCK_FILE, "r");
 
@@ -616,7 +614,7 @@ void view_products(const struct User user) {
                 &temp_product->last_entry_date.day, &temp_product->last_entry_date.month, &temp_product->last_entry_date.year,
                 &temp_product->last_exit_date.day, &temp_product->last_exit_date.month, &temp_product->last_exit_date.year) != EOF)
     // Check if the product belongs to the current user
-    if (strcmp(temp_product->username, user.username) == 0) {
+    if (strcmp(temp_product->username, user->username) == 0) {
       if (found_products == false)
         printf("--------------------------------------------------------------------\n");
       found_products = true; // Mark that products were found
@@ -625,10 +623,8 @@ void view_products(const struct User user) {
     }
 
   // Check if no products were found
-  if (found_products == false) {
-    printf(ORANGE "No products found.\n" RESET);
-    sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
-  }
+  if (found_products == false)
+    print_warning_message("No products found");
   else
     system("pause");
 
@@ -693,7 +689,9 @@ int compare_products_by_name(const void *a, const void *b) {
   return strcmp(product_a->name, product_b->name);
 }
 
-void sort_products_by_name(const struct User user) {
+//! ERROR: unused parameter 'user'
+//TODO: every user should have his own stock file
+void sort_products_by_name(const struct User *user) {
   // Open the database file in read mode
   FILE *file = fopen(STOCK_FILE, "r");
 
@@ -773,7 +771,7 @@ void sort_products_by_name(const struct User user) {
 
 void display_product(const struct Product *self) {
   // Display the product's information
-  printf(BROWN BOLD UNDERLINE "Id:" RESET GREEN " %hu\n" BROWN BOLD UNDERLINE "Name:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Description:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Username:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Unit Price:" RESET GREEN " %.2f\n" BROWN BOLD UNDERLINE "Quantity:" RESET GREEN " %u\n" BROWN BOLD UNDERLINE "Alert Threshold:" RESET GREEN " %u\n" BROWN BOLD UNDERLINE "Last Entry Date:" RESET GREEN " %hhu" RESET "/" RESET GREEN "%hhu" RESET "/" RESET GREEN "%hu\n" BROWN BOLD UNDERLINE "Last Exit Date:" RESET GREEN " %hhu" RESET "/" RESET GREEN "%hhu" RESET "/" RESET GREEN "%hu\n" RESET,
+  printf(BROWN BOLD UNDERLINE "Id:" RESET GREEN " %hu\n" BROWN BOLD UNDERLINE "Name:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Description:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Username:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Unit Price:" RESET GREEN " %.2f\n" BROWN BOLD UNDERLINE "Quantity:" RESET GREEN " %zu\n" BROWN BOLD UNDERLINE "Alert Threshold:" RESET GREEN " %zu\n" BROWN BOLD UNDERLINE "Last Entry Date:" RESET GREEN " %hhu" RESET "/" RESET GREEN "%hhu" RESET "/" RESET GREEN "%hu\n" BROWN BOLD UNDERLINE "Last Exit Date:" RESET GREEN " %hhu" RESET "/" RESET GREEN "%hhu" RESET "/" RESET GREEN "%hu\n" RESET,
           self->id,
           self->name,
           self->description,

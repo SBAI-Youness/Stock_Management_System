@@ -1,5 +1,4 @@
-#ifndef USER_H
-#define USER_H
+#pragma once
 
 #include "./utils.h"
 
@@ -41,7 +40,7 @@ extern void sign_up();
 extern void log_in();
 
 // Function used to manage and handle a session for a given user
-extern void user_session(const const struct User *user);
+extern void user_session(const struct User *user);
 
 // Function used to read the user's username in a secure way
 extern void set_username(struct User *self);
@@ -69,5 +68,3 @@ extern void save_user(const struct User *self);
 
 // Function used to free the memory allocated for a user
 extern void free_user(struct User *self);
-
-#endif

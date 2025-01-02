@@ -1,5 +1,4 @@
-#ifndef UTILS_H
-#define UTILS_H
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +43,7 @@ extern void display_main_menu(size_t *menu_choice);
 extern void print_success_message(const char *success_message);
 
 // Function used to print warning messages
-extern void print_warning_message(const char *format, ...);
+extern void print_warning_message(const char *warning_message, ...);
 
 // Function used to print error messages
 extern void print_error_message(const char *error_message);
@@ -57,5 +56,3 @@ extern void exit_program();
 
 // Function used to handle invalid choices
 extern void invalid_choice();
-
-#endif

@@ -22,11 +22,11 @@ void print_success_message(const char *success_message) {
   sleep(NORMAL_DELAY); // Wait for 3 seconds
 }
 
-void print_warning_message(const char *format, ...) {
+void print_warning_message(const char *warning_message, ...) {
     va_list args;
-    va_start(args, format);
+    va_start(args, warning_message);
     printf(ORANGE "Warning: ");
-    vprintf(format, args);
+    vprintf(warning_message, args);
     printf("!\n" RESET);
     va_end(args);
     sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
