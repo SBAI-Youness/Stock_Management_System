@@ -1,6 +1,6 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -Iinclude
+CFLAGS = -Iinclude -Wall -Werror -Wextra -Wpedantic
 RC = windres
 
 # Directories and source files
