@@ -60,7 +60,7 @@ void product_management_menu(const struct User *user) {
         add_product(user);
         break;
       case 2:
-        // Modify a product
+        modify_product(user);
         break;
       case 3:
         delete_product(user);
@@ -456,6 +456,130 @@ void set_current_date(struct Date *date) {
   date->day = tm.tm_mday;
   date->month = tm.tm_mon + 1; // tm_mon is 0-11, so add 1
   date->year = tm.tm_year + 1900; // tm_year is years since 1900
+}
+
+void modify_product(const struct User *user) {
+  print_project_name();
+  printf(DARK_GREEN UNDERLINE "\t--- Modify Product ---\n\n" RESET);
+
+  uint16_t product_id;
+
+  // Set the product's id
+  while (true) {
+    printf("Id: ");
+    if (scanf("%hu", &product_id) != 1 || is_id_valid(product_id) == false) {
+      print_warning_message("Invalid product id");
+      printf("\033[A\033[2K");
+      printf("\033[A\033[2K");
+      rewind(stdin); // Clear the input buffer
+      continue;
+    }
+
+    printf("--------------------------------------------------------------------\n");
+    break;
+  }
+
+  // Open the database file in read mode
+  FILE *file = fopen(STOCK_FILE, "r");
+
+  // Check if the file was opened successfully
+  if (file == NULL) {
+    print_error_message("Failed to open the stock file");
+    return;
+  }
+
+  // Read the entire file into memory
+  fseek(file, 0, SEEK_END);
+  long file_size = ftell(file);
+  fseek(file, 0, SEEK_SET);
+
+  // Allocate memory for the file contents
+  char *file_contents = (char *) malloc(file_size + 1);
+
+  // Check if memory allocation was successful
+  if (file_contents == NULL) {
+    print_error_message("Failed to allocate memory for file contents");
+    fclose(file);
+    return;
+  }
+
+  fread(file_contents, 1, file_size, file);
+  file_contents[file_size] = '\0';
+  fclose(file);
+
+  // Open the database file in write mode
+  file = fopen(STOCK_FILE, "w");
+
+  // Check if the file was opened successfully
+  if (file == NULL) {
+    print_error_message("Failed to open the stock file");
+    free(file_contents);
+    return;
+  }
+
+  // Write the header to the file
+  fprintf(file, STOCK_HEADER_FILE);
+
+  bool product_found = false; // Flag to check if the product was found in the file or not
+  struct Product *temp_product = create_product(); // Create a temporary product structure
+
+  // Check if the temporary product was created successfully
+  if (temp_product == NULL) {
+    print_error_message("Failed to create a temporary product");
+    free(file_contents);
+    fclose(file);
+    return;
+  }
+
+  // Parse the file contents and write back all products, modifying the specified product
+  char *line = strtok(file_contents, "\n");
+  while (line != NULL) {
+    if (sscanf(line, "%hu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu",
+               &temp_product->id,
+               temp_product->name,
+               temp_product->description,
+               temp_product->username,
+               &temp_product->unit_price,
+               &temp_product->quantity,
+               &temp_product->alert_threshold,
+               &temp_product->last_entry_date.day, &temp_product->last_entry_date.month, &temp_product->last_entry_date.year,
+               &temp_product->last_exit_date.day, &temp_product->last_exit_date.month, &temp_product->last_exit_date.year) == 13) {
+      // If the current product's id matches the one to modify, update its details
+      if (temp_product->id == product_id && strcmp(temp_product->username, user->username) == 0) {
+        product_found = true;
+
+        // Modify the product's details
+        temp_product->set_name(temp_product);
+        temp_product->set_description(temp_product);
+        temp_product->set_unit_price(temp_product);
+        temp_product->set_quantity(temp_product);
+        temp_product->set_alert_threshold(temp_product);
+      }
+
+      // Write the current product to the file
+      fprintf(file, "%hu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
+                      temp_product->id,
+                      temp_product->name,
+                      temp_product->description,
+                      temp_product->username,
+                      temp_product->unit_price,
+                      temp_product->quantity,
+                      temp_product->alert_threshold,
+                      temp_product->last_entry_date.day, temp_product->last_entry_date.month, temp_product->last_entry_date.year,
+                      temp_product->last_exit_date.day, temp_product->last_exit_date.month, temp_product->last_exit_date.year);
+    }
+    line = strtok(NULL, "\n");
+  }
+
+  if (product_found == true)
+    print_success_message("Product modified successfully");
+  else
+    print_warning_message("Product not found");
+
+  // Close the file and free the temporary product
+  fclose(file);
+  temp_product->free_product(temp_product);
+  free(file_contents);
 }
 
 void delete_product(const struct User *user) {

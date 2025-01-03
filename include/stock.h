@@ -97,6 +97,9 @@ extern bool is_alert_threshold_valid(size_t threshold, size_t quantity);
 // Function used to set a Date structure to the current date
 extern void set_current_date(struct Date *date);
 
+// Function used to modify a product
+extern void modify_product(const struct User *user);
+
 // Function used to delete a product
 extern void delete_product(const struct User *user);
 

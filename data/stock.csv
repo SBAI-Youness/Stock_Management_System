@@ -1,6 +1,6 @@
 Id,Name,Description,Username,Unit Price(in $),Stock Quantity,Stock Alert Threshold,Last Stock Entry Date,Last Stock Exit Date
-53242,Dell Inspiron439,This laptop has touch screen,amine_bounya,900.00,400,20,9/10/2023,1/12/2024
-12456,Iphone 16,This is the latest iphone,youness_sbai,1500.00,1000,90,19/10/2024,12/12/2024
+53242,Gillette,The best a man can get,amine_bounya,0.50,400,100,9/10/2023,1/12/2024
+12456,Iphone 16,FYI this is the same as Iphone 13,youness_sbai,1500.00,1000,90,19/10/2024,12/12/2024
 31282,Tager,Small tager,oprog,0.15,200,30,30/12/2024,30/12/2024
 12345,Toyota Corrola,This is a good car,oussama_el_arif,7000.00,150,10,20/12/2022,26/12/2024
 21268,Vista,Vista impermiable khawa dyali,ikram_khardali,15.00,300,70,30/12/2024,30/12/2024
