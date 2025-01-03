@@ -266,17 +266,31 @@ void set_password(struct User *self) {
   char temp_password[MAX_PASSWORD_LENGTH];
   bool isValid = false; // Flag to check if the password is valid or not
 
+  // Get the standard input handle
+  HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+  DWORD mode;
+
   while (isValid == false) {
     printf("Password: ");
     rewind(stdin);
+
+    // Get current console mode
+    GetConsoleMode(hStdin, &mode);
+    // Disable echo
+    SetConsoleMode(hStdin, mode & ~ENABLE_ECHO_INPUT);
 
     // Use secure input reading with size limit
     if (fgets(temp_password, MAX_PASSWORD_LENGTH, stdin) == NULL) {
       print_error_message("Failed to read password"); // Handle input error
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
+      // Restore console mode
+      SetConsoleMode(hStdin, mode);
       continue;
     }
+
+    // Restore console mode
+    SetConsoleMode(hStdin, mode);
 
     // Sanitize input by removing trailing newline
     size_t length = strcspn(temp_password, "\n");
