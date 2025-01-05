@@ -10,6 +10,7 @@
 
 #define MIN_NAME_LENGTH 4
 #define MAX_NAME_LENGTH 16
+
 #define MIN_DESCRIPTION_LENGTH 8
 #define MAX_DESCRIPTION_LENGTH 64
 
@@ -22,7 +23,7 @@ struct Date {
 // Product structure with attributes and methods (function pointers)
 struct Product {
   //* Attributes
-  uint16_t id;
+  unsigned long long int id;
   char *name;
   char *description;
   char *username;
@@ -56,13 +57,10 @@ extern void product_management_menu(const struct User *user);
 extern void add_product(const struct User *user);
 
 // Function used to generate a unique id for a product
-extern uint16_t generate_unique_product_id();
-
-// Function used to check if an id is valid
-extern bool is_id_valid(uint16_t id);
+extern unsigned long long int generate_unique_product_id();
 
 // Function used to check if a product id is already taken
-extern bool is_product_id_taken(uint16_t id);
+extern bool is_product_id_taken(unsigned long long int id);
 
 // Function used to set the product's name
 extern void set_name(struct Product *self);
@@ -110,7 +108,7 @@ extern void view_products(const struct User *user);
 extern struct Product *search_product(const char *name, const char *username);
 
 // Function used to sort the database by name
-extern void sort_products_by_name(const struct User *user);
+extern void sort_products_by_name();
 
 // Function used to compare products by name
 extern int compare_products_by_name(const void *a, const void *b);

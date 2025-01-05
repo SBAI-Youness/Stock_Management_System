@@ -2,10 +2,10 @@
 
 void print_project_name() {
   system("cls");
-  printf(BLUE BOLD UNDERLINE "\t\t=== Stock Management System ===\n\n" RESET);
+  printf(BLUE BOLD UNDERLINE "\t\t=== %s ===\n\n" RESET, PROJECT_NAME);
 }
 
-void display_main_menu(size_t *menu_choice) {
+void display_main_menu_and_get_choice(size_t *menu_choice) {
   system("cls");
   print_project_name();
   printf("1. Sign Up\n");
@@ -23,13 +23,13 @@ void print_success_message(const char *success_message) {
 }
 
 void print_warning_message(const char *warning_message, ...) {
-    va_list args;
-    va_start(args, warning_message);
-    printf(ORANGE "Warning: ");
-    vprintf(warning_message, args);
-    printf("!\n" RESET);
-    va_end(args);
-    sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
+  va_list args;
+  va_start(args, warning_message);
+  printf(ORANGE "Warning: ");
+  vprintf(warning_message, args);
+  printf("!\n" RESET);
+  va_end(args);
+  sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
 }
 
 void print_error_message(const char *error_message) {

@@ -6,13 +6,13 @@ struct User *create_user() {
 
   // Check if memory allocation was successful
   if (new_user == NULL) {
-    print_error_message("Failed to  allocate memory for the new user");
+    print_error_message("Failed to allocate memory for the new user");
     return NULL;
   }
 
   // Allocate memory for user attributes
-  new_user->username = (char *) malloc(MAX_USERNAME_LENGTH * sizeof(char));
-  new_user->password = (char *) malloc(MAX_PASSWORD_LENGTH * sizeof(char));
+  new_user->username = (char *) malloc((MAX_USERNAME_LENGTH + 1) * sizeof(char));
+  new_user->password = (char *) malloc((MAX_PASSWORD_LENGTH + 1) * sizeof(char));
 
   // Check if memory allocation was successful
   if (new_user->username == NULL || new_user->password == NULL) {
@@ -47,29 +47,34 @@ void sign_up() {
   }
 
   // Set the user's username and password
-  bool isUnique = false; // Flag to check if the username is unique or not
+  bool isUsernameUnique = false; // Flag to check if the username is unique or not
 
-  while (isUnique == false) {
+  while (isUsernameUnique == false) {
     print_project_name();
     printf(DARK_GREEN UNDERLINE "\t--- Sign up ---\n\n" RESET);
     user->set_username(user); // Set the user's username
 
     // Check if the username is unique
-    if (is_username_taken(user->username) == false)
-      isUnique = true;
-    else
+    if (is_username_taken(user->username) == true) {
       print_warning_message("Username is already taken. Please choose a different username");
+      continue;
+    }
+
+    isUsernameUnique = true;
   }
 
   // Set the user's password
   user->set_password(user);
 
+  // Save the user to the users file
   user->save_user(user);
 
   print_success_message("User successfully signed up");
 
+  // Start a session for the user
   user_session(user);
 
+  // Free the memory allocated for the user
   user->free_user(user);
 }
 
@@ -92,18 +97,19 @@ void log_in() {
     user->set_password(user); // Set the user's password
 
     // Check if the user is authenticated
-    if (authenticate_user(user->username, user->password) == true) {
-      print_success_message("User successfully logged in");
-      isAuthenticated = true;
-    }
-    else
+    if (authenticate_user(user->username, user->password) == false) {
       print_warning_message("Invalid username or password. Please try again");
+      continue;
+    }
+
+    print_success_message("User successfully logged in");
+    isAuthenticated = true;
   }
 
-  // Display the user's information
+  // Start a session for the user
   user_session(user);
 
-  // Free the user memory
+  // Free the memory allocated for the user
   user->free_user(user);
 }
 
@@ -137,7 +143,7 @@ void user_session(const struct User *user) {
       case 3: // View all products in the database
         view_products(user);
         break;
-      case 4:
+      case 4: // Search for a product in the database
         print_project_name();
         printf(DARK_GREEN UNDERLINE "\t--- Search Products ---\n\n" RESET);
 
@@ -155,17 +161,16 @@ void user_session(const struct User *user) {
         system("pause");
         product->free_product(product);
         break;
-      case 5:
-        // Sort products by name and unit price
-        sort_products_by_name(user);
+      case 5: // Sort products by name
+        sort_products_by_name();
         break;
-      case 6:
+      case 6: // Log out
         log_out();
         break;
-      case 7:
+      case 7: // Exit the program
         exit_program();
         break;
-      default:
+      default: // Invalid choice
         invalid_choice();
     }
   } while (session_choice != 6); // Exit the loop if the user chooses to log out
@@ -178,7 +183,7 @@ void set_username(struct User *self) {
     return;
   }
 
-  char temp_username[MAX_USERNAME_LENGTH];
+  char temp_username[MAX_USERNAME_LENGTH + 2];
   bool isValid = false; // Flag to check if the username is valid or not
 
   while (isValid == false) {
@@ -186,7 +191,7 @@ void set_username(struct User *self) {
     rewind(stdin);
 
     // Use secure input reading with size limit
-    if (fgets(temp_username, MAX_USERNAME_LENGTH, stdin) == NULL) {
+    if (fgets(temp_username, sizeof(temp_username) / sizeof(char), stdin) == NULL) {
       print_error_message("Failed to read username"); // Handle input error
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
@@ -197,7 +202,7 @@ void set_username(struct User *self) {
     size_t length = strcspn(temp_username, "\n");
     temp_username[length] = '\0';
 
-    if (strcmp(temp_username, "Username") == 0) {
+    if (strcasecmp(temp_username, "Username") == 0) {
       print_warning_message("You can't use this username");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
@@ -220,10 +225,10 @@ void set_username(struct User *self) {
       continue;
     }
 
-    // Copy validated username to user struct using strncpy
-    strncpy(self->username, temp_username, MAX_USERNAME_LENGTH - 1);
-    self->username[MAX_USERNAME_LENGTH - 1] = '\0';
-    isValid = true;
+    // Copy the validated username to the user structure
+    strncpy(self->username, temp_username, MAX_USERNAME_LENGTH);
+    self->username[MAX_USERNAME_LENGTH] = '\0'; // Ensure null-termination
+    isValid = true; // Exit loop after successful update
   }
 }
 
@@ -263,7 +268,7 @@ void set_password(struct User *self) {
     return;
   }
 
-  char temp_password[MAX_PASSWORD_LENGTH];
+  char temp_password[MAX_PASSWORD_LENGTH + 2];
   bool isValid = false; // Flag to check if the password is valid or not
 
   // Get the standard input handle
@@ -280,7 +285,7 @@ void set_password(struct User *self) {
     SetConsoleMode(hStdin, mode & ~ENABLE_ECHO_INPUT);
 
     // Use secure input reading with size limit
-    if (fgets(temp_password, MAX_PASSWORD_LENGTH, stdin) == NULL) {
+    if (fgets(temp_password, sizeof(temp_password) / sizeof(char), stdin) == NULL) {
       print_error_message("Failed to read password"); // Handle input error
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
@@ -312,10 +317,10 @@ void set_password(struct User *self) {
       continue;
     }
 
-    // Copy validated password to user struct using strncpy
-    strncpy(self->password, temp_password, MAX_PASSWORD_LENGTH - 1);
-    self->password[MAX_PASSWORD_LENGTH - 1] = '\0';
-    isValid = true;
+    // Copy the validated password to the user structure
+    strncpy(self->password, temp_password, MAX_PASSWORD_LENGTH);
+    self->password[MAX_PASSWORD_LENGTH] = '\0'; // Ensure null-termination
+    isValid = true; // Exit loop after successful update
   }
 }
 
@@ -359,9 +364,9 @@ bool is_username_taken(const char *username) {
     return false;
   }
 
-  char tempUsername[MAX_USERNAME_LENGTH];
-  while (fscanf(file, "%16[^,],%*s\n", tempUsername) == 1)
-    if (strcmp(tempUsername, username) == 0) {
+  char temp_username[MAX_USERNAME_LENGTH + 1];
+  while (fscanf(file, "%16[^,],%*s\n", temp_username) == 1)
+    if (strcmp(temp_username, username) == 0) {
       fclose(file);
       return true; // Username is already taken
     }

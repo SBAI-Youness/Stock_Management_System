@@ -6,9 +6,10 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <time.h>
+#include <limits.h>
 #include <string.h>
 #include <ctype.h>
-#include <windows.h>
+#include <windows.h> // Even though I hate Windows (Microsoft), I have to use it for this project
 
 #include "./users.h"
 #include "./stock.h"
@@ -36,8 +37,8 @@
 // Function used to print the project name
 extern void print_project_name();
 
-// Function used to display the main menu
-extern void display_main_menu(size_t *menu_choice);
+// Function used to display the main menu and get the user's choice
+extern void display_main_menu_and_get_choice(size_t *menu_choice);
 
 // Function used to print success messages
 extern void print_success_message(const char *success_message);
@@ -48,7 +49,7 @@ extern void print_warning_message(const char *warning_message, ...);
 // Function used to print error messages
 extern void print_error_message(const char *error_message);
 
-// Function used to log out
+// Function used to log out of the session
 extern void log_out();
 
 // Function used to exit the program

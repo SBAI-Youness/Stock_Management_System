@@ -11,9 +11,9 @@ struct Product *create_product() {
   }
 
   // Allocate memory for product attributes
-  new_product->name = (char *) malloc(MAX_NAME_LENGTH * sizeof(char));
-  new_product->description = (char *) malloc(MAX_DESCRIPTION_LENGTH * sizeof(char));
-  new_product->username = (char *) malloc(MAX_USERNAME_LENGTH * sizeof(char));
+  new_product->name = (char *) malloc((MAX_NAME_LENGTH + 1) * sizeof(char));
+  new_product->description = (char *) malloc((MAX_DESCRIPTION_LENGTH + 1) * sizeof(char));
+  new_product->username = (char *) malloc((MAX_USERNAME_LENGTH + 1) * sizeof(char));
 
   // Check if memory allocation was successful
   if (new_product->name == NULL || new_product->description == NULL || new_product->username == NULL) {
@@ -56,18 +56,18 @@ void product_management_menu(const struct User *user) {
     rewind(stdin); // Clear input buffer
 
     switch (menu_choice) {
-      case 1:
+      case 1: // Add a new product
         add_product(user);
         break;
-      case 2:
+      case 2: // Modify a product
         modify_product(user);
         break;
-      case 3:
+      case 3: // Delete a product
         delete_product(user);
         break;
-      case 4:
+      case 4: // Go back to the user session menu
         break;
-      default:
+      default: // Invalid choice
         invalid_choice();
     }
   } while (menu_choice != 4); // Exit the loop if the user chooses to go back to the user session menu
@@ -84,8 +84,7 @@ void add_product(const struct User *user) {
   }
 
   // Generate a unique product ID
-  //! ERROR: comparison is always true due to limited range of data type (0-65535)
-  if ((new_product->id = generate_unique_product_id()) > 65535) {
+  if ((new_product->id = generate_unique_product_id()) == 0) {
     print_error_message("Failed to add a new product (Not enough space)");
     new_product->free_product(new_product);
     return;
@@ -133,21 +132,28 @@ void add_product(const struct User *user) {
   new_product->free_product(new_product);
 }
 
-uint16_t generate_unique_product_id() {
-  uint16_t id;
+unsigned long long int generate_unique_product_id() {
+  unsigned long long int id,
+                         max_attempts = ULLONG_MAX; // Maximum number of attempts to generate a unique ID
 
   do {
-    id = rand() % 65536; // Generate a random number between 0 and 65535
-  } while(is_product_id_taken(id) == true && is_id_valid(id) == true);
+    // Generate a random number between 1 and ULLONG_MAX
+    id = (unsigned long long int)rand() * rand();
+    id = id % (ULLONG_MAX - 1) + 1; // Ensure the range is between 1 and ULLONG_MAX
 
-  return id;
+    // Check if the generated ID is unique
+    if (is_product_id_taken(id) == false)
+      return id;
+
+    // Decrement the number of attempts
+    max_attempts--;
+  } while(max_attempts > 0);
+
+  // If no valid ID could be generated, return 0 to indicate no space left in the stock
+  return 0;
 }
 
-bool is_id_valid(uint16_t id) {
-  return id >= 0 && id <= 65535;
-}
-
-bool is_product_id_taken(uint16_t id) {
+bool is_product_id_taken(unsigned long long int id) {
   // Open the stock file in read-only mode
   FILE *file = fopen(STOCK_FILE, "r");
 
@@ -157,9 +163,9 @@ bool is_product_id_taken(uint16_t id) {
     return true;
   }
 
-  uint16_t temp_id;
+  unsigned long long int temp_id;
 
-  while (fscanf(file, "%hu,%*s\n", &temp_id) == 1)
+  while (fscanf(file, "%llu,%*s\n", &temp_id) == 1)
     if (temp_id == id){
       fclose(file);
       return true; // ID is taken
@@ -177,7 +183,7 @@ void set_name(struct Product *self) {
     return;
   }
 
-  char temp_name[MAX_NAME_LENGTH];
+  char temp_name[MAX_NAME_LENGTH + 2]; // Temporary buffer to store the product's name
   bool isValid = false; // Flag to check if the product's name is valid or not
 
   while (isValid == false) {
@@ -185,7 +191,7 @@ void set_name(struct Product *self) {
     rewind(stdin);
 
     // Use secure input reading with size limit
-    if (fgets(temp_name, MAX_NAME_LENGTH, stdin) == NULL) {
+    if (fgets(temp_name, sizeof(temp_name) / sizeof(char), stdin) == NULL) {
       print_error_message("Failed to read name"); // Handle input error
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
@@ -219,10 +225,10 @@ void set_name(struct Product *self) {
       continue;
     }
 
-    // Copy validated name to product struct using strncpy
-    strncpy(self->name, temp_name, MAX_NAME_LENGTH - 1);
-    self->name[MAX_NAME_LENGTH - 1] = '\0';
-    isValid = true;
+    // Copy the validated name to the product structure
+    strncpy(self->name, temp_name, MAX_NAME_LENGTH);
+    self->name[MAX_NAME_LENGTH] = '\0'; // Ensure null-termination
+    isValid = true; // Exit loop after successful update
   }
 }
 
@@ -270,7 +276,7 @@ void set_description(struct Product *self) {
     return;
   }
 
-  char temp_description[MAX_DESCRIPTION_LENGTH];
+  char temp_description[MAX_DESCRIPTION_LENGTH + 2];
   bool isValid = false; // Flag to check if the product's description is valid or not
 
   while (isValid == false) {
@@ -278,7 +284,7 @@ void set_description(struct Product *self) {
     rewind(stdin);
 
     // Use secure input reading with size limit
-    if (fgets(temp_description, MAX_DESCRIPTION_LENGTH, stdin) == NULL) {
+    if (fgets(temp_description, sizeof(temp_description) / sizeof(char), stdin) == NULL) {
       print_error_message("Failed to read description"); // Handle input error
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
@@ -304,10 +310,10 @@ void set_description(struct Product *self) {
       continue;
     }
 
-    // Copy validated description to product struct using strncpy
-    strncpy(self->description, temp_description, MAX_DESCRIPTION_LENGTH - 1);
-    self->description[MAX_DESCRIPTION_LENGTH - 1] = '\0';
-    isValid = true;
+    // Copy the validated description to the product structure
+    strncpy(self->description, temp_description, MAX_DESCRIPTION_LENGTH);
+    self->description[MAX_DESCRIPTION_LENGTH] = '\0'; // Ensure null-termination
+    isValid = true; // Exit loop after successful update
   }
 }
 
@@ -462,12 +468,12 @@ void modify_product(const struct User *user) {
   print_project_name();
   printf(DARK_GREEN UNDERLINE "\t--- Modify Product ---\n\n" RESET);
 
-  uint16_t product_id;
+  unsigned long long int product_id;
 
   // Set the product's id
   while (true) {
     printf("Id: ");
-    if (scanf("%hu", &product_id) != 1 || is_id_valid(product_id) == false) {
+    if (scanf("%llu", &product_id) != 1 || product_id == 0) {
       print_warning_message("Invalid product id");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
@@ -534,7 +540,7 @@ void modify_product(const struct User *user) {
   // Parse the file contents and write back all products, modifying the specified product
   char *line = strtok(file_contents, "\n");
   while (line != NULL) {
-    if (sscanf(line, "%hu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu",
+    if (sscanf(line, "%llu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu",
                &temp_product->id,
                temp_product->name,
                temp_product->description,
@@ -557,7 +563,7 @@ void modify_product(const struct User *user) {
       }
 
       // Write the current product to the file
-      fprintf(file, "%hu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
+      fprintf(file, "%llu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
                       temp_product->id,
                       temp_product->name,
                       temp_product->description,
@@ -654,7 +660,7 @@ void delete_product(const struct User *user) {
   // Parse the file contents and write back all products except the one to be deleted
   char *line = strtok(file_contents, "\n");
   while (line != NULL) {
-    if (sscanf(line, "%hu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu",
+    if (sscanf(line, "%llu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu",
                &temp_product->id,
                temp_product->name,
                temp_product->description,
@@ -665,11 +671,11 @@ void delete_product(const struct User *user) {
                &temp_product->last_entry_date.day, &temp_product->last_entry_date.month, &temp_product->last_entry_date.year,
                &temp_product->last_exit_date.day, &temp_product->last_exit_date.month, &temp_product->last_exit_date.year) == 13) {
       // If the current product's name matches the one to delete, skip writing it to the file
-      if (strcmp(temp_product->name, product->name) == 0 && strcmp(temp_product->username, user->username) == 0)
+      if (strcasecmp(temp_product->name, product->name) == 0 && strcmp(temp_product->username, user->username) == 0)
         product_found = true;
       else {
         // Write the current product to the file
-        fprintf(file, "%hu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
+        fprintf(file, "%llu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
                       temp_product->id,
                       temp_product->name,
                       temp_product->description,
@@ -727,7 +733,7 @@ void view_products(const struct User *user) {
   }
 
   // Read the file line by line and display the products
-  while (fscanf(file, "%hu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
+  while (fscanf(file, "%llu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
                 &temp_product->id,
                 temp_product->name,
                 temp_product->description,
@@ -783,7 +789,7 @@ struct Product *search_product(const char *name, const char *username) {
   // Skip the header line by seeking to the next line
   fseek(file, strlen(STOCK_HEADER_FILE), SEEK_SET);
 
-  while (fscanf(file, "%hu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
+  while (fscanf(file, "%llu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
                 &temp_product->id,
                 temp_product->name,
                 temp_product->description,
@@ -793,7 +799,7 @@ struct Product *search_product(const char *name, const char *username) {
                 &temp_product->alert_threshold,
                 &temp_product->last_entry_date.day, &temp_product->last_entry_date.month, &temp_product->last_entry_date.year,
                 &temp_product->last_exit_date.day, &temp_product->last_exit_date.month, &temp_product->last_exit_date.year) != EOF)
-    if (strcmp(temp_product->name, name) == 0 && strcmp(temp_product->username, username) == 0) {
+    if (strcasecmp(temp_product->name, name) == 0 && strcmp(temp_product->username, username) == 0) {
       // Product found, return the pointer to the product
       fclose(file);
       return temp_product;
@@ -813,9 +819,8 @@ int compare_products_by_name(const void *a, const void *b) {
   return strcmp(product_a->name, product_b->name);
 }
 
-//! ERROR: unused parameter 'user'
 //TODO: every user should have his own stock file
-void sort_products_by_name(const struct User *user) {
+void sort_products_by_name() {
   // Open the database file in read mode
   FILE *file = fopen(STOCK_FILE, "r");
 
@@ -834,7 +839,7 @@ void sort_products_by_name(const struct User *user) {
 
   // Read the products from the file
   struct Product *temp_product = create_product();
-  while (fscanf(file, "%hu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
+  while (fscanf(file, "%llu,%[^,],%[^,],%[^,],%f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
                 &temp_product->id,
                 temp_product->name,
                 temp_product->description,
@@ -873,7 +878,7 @@ void sort_products_by_name(const struct User *user) {
 
   // Write the sorted products to the file
   for (size_t i = 0; i < product_count; i++) {
-    fprintf(file, "%hu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
+    fprintf(file, "%llu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
             products[i]->id,
             products[i]->name,
             products[i]->description,
@@ -895,7 +900,7 @@ void sort_products_by_name(const struct User *user) {
 
 void display_product(const struct Product *self) {
   // Display the product's information
-  printf(BROWN BOLD UNDERLINE "Id:" RESET GREEN " %hu\n" BROWN BOLD UNDERLINE "Name:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Description:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Username:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Unit Price:" RESET GREEN " %.2f\n" BROWN BOLD UNDERLINE "Quantity:" RESET GREEN " %zu\n" BROWN BOLD UNDERLINE "Alert Threshold:" RESET GREEN " %zu\n" BROWN BOLD UNDERLINE "Last Entry Date:" RESET GREEN " %hhu" RESET "/" RESET GREEN "%hhu" RESET "/" RESET GREEN "%hu\n" BROWN BOLD UNDERLINE "Last Exit Date:" RESET GREEN " %hhu" RESET "/" RESET GREEN "%hhu" RESET "/" RESET GREEN "%hu\n" RESET,
+  printf(BROWN BOLD UNDERLINE "Id:" RESET GREEN " %llu\n" BROWN BOLD UNDERLINE "Name:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Description:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Username:" RESET GREEN " %s\n" BROWN BOLD UNDERLINE "Unit Price:" RESET GREEN " %.2f\n" BROWN BOLD UNDERLINE "Quantity:" RESET GREEN " %zu\n" BROWN BOLD UNDERLINE "Alert Threshold:" RESET GREEN " %zu\n" BROWN BOLD UNDERLINE "Last Entry Date:" RESET GREEN " %hhu" RESET "/" RESET GREEN "%hhu" RESET "/" RESET GREEN "%hu\n" BROWN BOLD UNDERLINE "Last Exit Date:" RESET GREEN " %hhu" RESET "/" RESET GREEN "%hhu" RESET "/" RESET GREEN "%hu\n" RESET,
           self->id,
           self->name,
           self->description,
@@ -930,7 +935,7 @@ void save_product(const struct Product *self) {
     fprintf(file, STOCK_HEADER_FILE); // Write headers
 
   // Write product data to the file
-  fprintf(file, "%hu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
+  fprintf(file, "%llu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
           self->id,
           self->name,
           self->description,
