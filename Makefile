@@ -1,6 +1,7 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -Iinclude -Wall -Werror -Wextra -Wpedantic
+CFLAGS = -Iinclude -Iinclude/openssl -Wall -Werror -Wextra -Wpedantic
+LDFLAGS = -Llibraries -lssl -lcrypto
 RC = windres
 
 # Directories and source files
@@ -25,7 +26,7 @@ $(RESOURCE_OBJ): $(RESOURCE) | $(BUILD)
 
 # Build target for app
 $(TARGET): $(SRC) $(RESOURCE_OBJ) | $(BUILD)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 # Run the program after building
 run: $(TARGET)
