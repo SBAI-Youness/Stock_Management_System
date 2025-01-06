@@ -55,6 +55,9 @@ extern void set_password(struct User *self);
 // Function used to check if the password is valid
 extern bool is_password_valid(const char *password);
 
+// Function used to hash the user's password
+extern char *hash_password(const char *password);
+
 // Function used to check if a username is taken or not
 extern bool is_username_taken(const char *username);
 

@@ -10,6 +10,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <windows.h> // Even though I hate Windows (Microsoft), I have to use it for this project
+#include "./openssl/sha.h"
 
 #include "./users.h"
 #include "./stock.h"

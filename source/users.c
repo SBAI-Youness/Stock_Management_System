@@ -354,6 +354,21 @@ bool is_password_valid(const char *password) {
   return criteria_met >= 3;
 }
 
+char *hash_password(const char *password) {
+  if (password == NULL)
+    return NULL;
+
+  unsigned char hash[SHA256_DIGEST_LENGTH];
+  static char hash_hex[(SHA256_DIGEST_LENGTH * 2) + 1];
+
+  SHA256((unsigned char *)password, strlen(password), hash);
+
+  for (size_t i = 0; i < SHA256_DIGEST_LENGTH; i++)
+    sprintf(hash_hex + i * 2, "%02x", hash[i]);
+
+  return hash_hex;
+}
+
 bool is_username_taken(const char *username) {
   // Open the users file to search for the user
   FILE *file = fopen(USERS_FILE, "r");
@@ -386,22 +401,25 @@ bool authenticate_user(const char *username, const char *password) {
     return false;
   }
 
-  struct User *temp_user = create_user();
+  // Hash the password to compare it with the hashed password in the users file
+  char *hashed_password = hash_password(password);
 
-  // Check if the user was created successfully
-  if (temp_user == NULL) {
+  // Check if the password was hashed successfully
+  if (hashed_password == NULL) {
+    print_error_message("Failed to hash the password");
     fclose(file);
     return false;
   }
 
-  while (fscanf(file, "%16[^,],%36[^\n]\n", temp_user->username, temp_user->password) == 2)
-    if (strcmp(temp_user->username, username) == 0 && strcmp(temp_user->password, password) == 0) {
-      temp_user->free_user(temp_user);
+  char temp_username[MAX_USERNAME_LENGTH + 1],
+       temp_password[(SHA256_DIGEST_LENGTH * 2) + 1];
+
+  while (fscanf(file, "%16[^,],%64[^\n]\n", temp_username, temp_password) == 2)
+    if (strcmp(temp_username, username) == 0 && strcmp(temp_password, hashed_password) == 0) {
       fclose(file);
       return true; // Authentication successful
     }
 
-  temp_user->free_user(temp_user);
   fclose(file);
   return false; // Authentication failed
 }
@@ -426,8 +444,18 @@ void save_user(const struct User *self) {
   if (file_size == 0)
     fprintf(file, USERS_HEADER_FILE); // Write headers
 
+  // Hash the password before writing it to the users file
+  char *hashed_password = hash_password(self->password);
+
+  // Check if the password was hashed successfully
+  if (hashed_password == NULL) {
+    print_error_message("Failed to hash the password");
+    return;
+  }
+
   // Write username and password to the file
-  fprintf(file, "%s,%s\n", self->username, self->password);
+  fprintf(file, "%s,%s\n", self->username, hashed_password);
+
   fclose(file); // Close the file after writing
 }
 
