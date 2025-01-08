@@ -92,6 +92,9 @@ void log_in() {
   uint32_t lockout_time = INITIAL_LOCKOUT_TIME; // lockout time in seconds
   time_t lockout_start = 0; // Time when the user was locked out
 
+  // Load the lockout data from the file
+  load_lockout_data(&failed_attempts, &lockout_time, &lockout_start);
+
   bool isAuthenticated = false; // Flag to check if the user is authenticated or not
 
   while (isAuthenticated == false) {
@@ -110,11 +113,19 @@ void log_in() {
     if (authenticate_user(user->username, user->password) == false) {
       print_warning_message("Invalid username or password. Please try again");
       failed_attempts++;
+      save_lockout_data(failed_attempts, lockout_time, lockout_start);
       continue;
     }
 
     print_success_message("User successfully logged in");
     isAuthenticated = true;
+    // Reset lockout data after successful login
+    failed_attempts = 0;
+    lockout_time = INITIAL_LOCKOUT_TIME;
+    lockout_start = 0;
+
+    // Save the reset lockout data
+    save_lockout_data(failed_attempts, lockout_time, lockout_start);
   }
 
   // Start a session for the user

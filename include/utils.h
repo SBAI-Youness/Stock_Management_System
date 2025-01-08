@@ -20,6 +20,12 @@
 #define NORMAL_DELAY 3
 #define NOT_NORMAL_DELAY 5
 
+// Path to the lockout file
+#define LOCKOUT_FILE "../data/lockout.csv"
+
+// The header file of the lockout file
+#define LOCKOUT_HEADER_FILE "Failed Attempts,Lockout Time,Lockout Start\n"
+
 #define MAX_FAILED_ATTEMPTS 3
 #define INITIAL_LOCKOUT_TIME 30 // In seconds
 
@@ -70,3 +76,9 @@ extern void handle_lockout(uint8_t *failed_attempts, uint32_t *lockout_time, tim
 
 // Function used to display the lockout time
 extern void display_lockout_time(uint32_t seconds);
+
+// Function used to load the lockout data from a file
+extern void load_lockout_data(uint8_t *failed_attempts, uint32_t *lockout_time, time_t *lockout_start);
+
+// Function used to save the lockout data to a file
+extern void save_lockout_data(uint8_t failed_attempts, uint32_t lockout_time, time_t lockout_start);

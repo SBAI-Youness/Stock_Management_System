@@ -65,7 +65,7 @@ void handle_lockout(uint8_t *failed_attempts, uint32_t *lockout_time, time_t *lo
     (*lockout_start) = current_time; // Set the start time of the lockout
     printf(RED "Too many failed attempts. Locked out for ");
     display_lockout_time((*lockout_time));
-    printf(RESET);
+    printf("\n" RESET);
     sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
   }
 
@@ -84,6 +84,8 @@ void handle_lockout(uint8_t *failed_attempts, uint32_t *lockout_time, time_t *lo
   (*lockout_time) *= 2;  // Double the lockout time for the next lockout
   printf(GREEN "Lockout period over. You can try again.\n" RESET);
   sleep(NORMAL_DELAY); // Wait for a moment before letting the user try again
+
+  save_lockout_data((*failed_attempts), (*lockout_time), (*lockout_start));
 }
 
 void display_lockout_time(uint32_t seconds) {
@@ -104,4 +106,49 @@ void display_lockout_time(uint32_t seconds) {
     printf("%u minute%s, ", minutes, (minutes > 1)? "s": "");
 
   printf("%u second%s", seconds, (seconds > 1)? "s": "");
+}
+
+void load_lockout_data(uint8_t *failed_attempts, uint32_t *lockout_time, time_t *lockout_start) {
+  // Open the file for reading
+  FILE *file = fopen(LOCKOUT_FILE, "r");
+
+  // Check if the file was opened successfully
+  if (file == NULL) {
+    // If the file doesn't exist, initialize the lockout data
+    (*failed_attempts) = 0;
+    (*lockout_time) = INITIAL_LOCKOUT_TIME;
+    (*lockout_start) = 0;
+    return;
+  }
+
+  // Skip the header file
+  fseek(file, strlen(LOCKOUT_HEADER_FILE), SEEK_SET);
+
+  // Read the lockout data from the file
+  if (fscanf(file, "%hhu,%u,%lld", failed_attempts, lockout_time, lockout_start) != 3) {
+    // If the file is empty or the data is corrupted, initialize the lockout data
+    (*failed_attempts) = 0;
+    (*lockout_time) = INITIAL_LOCKOUT_TIME;
+    (*lockout_start) = 0;
+  }
+
+  // Close the file
+  fclose(file);
+}
+
+void save_lockout_data(uint8_t failed_attempts, uint32_t lockout_time, time_t lockout_start) {
+  // Open the file for writing
+  FILE *file = fopen(LOCKOUT_FILE, "w");
+
+  // Check if the file was opened successfully
+  if (file == NULL) {
+    print_error_message("Failed to save lockout data");
+    return;
+  }
+
+  // Write the lockout data to the file
+  fprintf(file, "%s%hhu,%u,%lld", LOCKOUT_HEADER_FILE, failed_attempts, lockout_time, lockout_start);
+
+  // Close the file
+  fclose(file);
 }
