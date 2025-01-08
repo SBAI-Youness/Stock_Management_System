@@ -52,3 +52,56 @@ void exit_program() {
 void invalid_choice() {
   print_warning_message("Invalid choice. Please try again");
 }
+
+bool should_user_get_locked_out(uint8_t failed_attempts) {
+  return failed_attempts >= MAX_FAILED_ATTEMPTS;
+}
+
+void handle_lockout(uint8_t *failed_attempts, uint32_t *lockout_time, time_t *lockout_start) {
+  time_t current_time = time(NULL); // Get the current time
+
+  // Checks if the lockout timer has been initialized
+  if ((*lockout_start) == 0) {
+    (*lockout_start) = current_time; // Set the start time of the lockout
+    printf(RED "Too many failed attempts. Locked out for ");
+    display_lockout_time((*lockout_time));
+    printf(RESET);
+    sleep(NOT_NORMAL_DELAY); // Wait for 5 seconds
+  }
+
+  // Check if lockout period has passed
+  if ((current_time - (*lockout_start)) < (*lockout_time)) {
+    printf(ORANGE "Please wait ");
+    display_lockout_time((*lockout_time) - (int)(current_time - (*lockout_start)));
+    printf(RESET);
+    sleep(1); // Prevent spamming
+    return;
+  }
+
+  // Reset failed attempts and lockout time after the lockout period ends
+  (*failed_attempts) = 0; // Reset failed attempts
+  (*lockout_start) = 0;  // Reset lockout timer
+  (*lockout_time) *= 2;  // Double the lockout time for the next lockout
+  printf(GREEN "Lockout period over. You can try again.\n" RESET);
+  sleep(NORMAL_DELAY); // Wait for a moment before letting the user try again
+}
+
+void display_lockout_time(uint32_t seconds) {
+  int days = seconds / 86400;  // 86400 seconds in a day
+  seconds %= 86400;
+  int hours = seconds / 3600; // 3600 seconds in an hour
+  seconds %= 3600;
+  int minutes = seconds / 60; // 60 seconds in a minute
+  seconds %= 60;
+
+  if (days > 0)
+    printf("%u day%s, ", days, (days > 1)? "s": "");
+
+  if (hours > 0)
+    printf("%u hour%s, ", hours, (hours > 1)? "s": "");
+
+  if (minutes > 0)
+    printf("%u minute%s, ", minutes, (minutes > 1)? "s": "");
+
+  printf("%u second%s", seconds, (seconds > 1)? "s": "");
+}

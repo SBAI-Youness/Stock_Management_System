@@ -88,17 +88,28 @@ void log_in() {
     return;
   }
 
+  uint8_t failed_attempts = 0; // Counter for failed login attempts
+  uint32_t lockout_time = INITIAL_LOCKOUT_TIME; // lockout time in seconds
+  time_t lockout_start = 0; // Time when the user was locked out
+
   bool isAuthenticated = false; // Flag to check if the user is authenticated or not
 
   while (isAuthenticated == false) {
     print_project_name();
     printf(DARK_GREEN UNDERLINE "\t--- Log in ---\n\n" RESET);
+
+    if (should_user_get_locked_out(failed_attempts) == true) {
+      handle_lockout(&failed_attempts, &lockout_time, &lockout_start);
+      continue;
+    }
+
     user->set_username(user); // Set the user's username
     user->set_password(user); // Set the user's password
 
     // Check if the user is authenticated
     if (authenticate_user(user->username, user->password) == false) {
       print_warning_message("Invalid username or password. Please try again");
+      failed_attempts++;
       continue;
     }
 

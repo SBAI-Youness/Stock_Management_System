@@ -20,6 +20,9 @@
 #define NORMAL_DELAY 3
 #define NOT_NORMAL_DELAY 5
 
+#define MAX_FAILED_ATTEMPTS 3
+#define INITIAL_LOCKOUT_TIME 30 // In seconds
+
 // Foreground text colors
 #define RESET       "\033[0m"
 #define RED         "\033[31m"                     // Error
@@ -58,3 +61,12 @@ extern void exit_program();
 
 // Function used to handle invalid choices
 extern void invalid_choice();
+
+// Function used to check if the user should get locked out or not
+extern bool should_user_get_locked_out(uint8_t failed_attempts);
+
+// Function used to handle the lockout logic
+extern void handle_lockout(uint8_t *failed_attempts, uint32_t *lockout_time, time_t *lockout_start);
+
+// Function used to display the lockout time
+extern void display_lockout_time(uint32_t seconds);
