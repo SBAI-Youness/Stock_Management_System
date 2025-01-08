@@ -1,6 +1,9 @@
 # Stock Management System
 ---
 
+<p align="center">
+  <img src="assets/icons/app_icon.png" alt="App Icon">
+</p>
 
 ## Overview
 The **Stock Management System** is a console-based application developed in C for managing inventory efficiently. It provides functionalities for handling product details and storing data persistently in CSV files. Designed with a user-friendly console interface, it simplifies inventory management tasks.
@@ -28,6 +31,12 @@ The **Stock Management System** is a console-based application developed in C fo
   - Sort products by name or unit price.
 - **Persistent Storage**:
   Save product data in a CSV file for future access.
+- **Security Features**:
+  - Password Hashing with OpenSSL: User passwords are securely hashed before storage to protect against unauthorized access.
+  - Brute Force Prevention: Implemented mechanisms to prevent brute force attacks, ensuring the security of user accounts.
+  - DDoS Protection: Measures in place to mitigate Distributed Denial of Service attacks, ensuring the availability of the system.
+
+  - Session Management: Secure session handling to prevent session hijacking and fixation.
 
 
 ## Technologies Used
