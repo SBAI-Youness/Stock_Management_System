@@ -2,8 +2,17 @@
 ---
 
 <p align="center">
-  <img src="assets/icons/app_icon.png" alt="App Icon">
+  <img src="assets/icons/app_icon.png" alt="App Icon" width="180">
 </p>
+
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License"></a>
+  <a href="https://github.com/SBAI-Youness/Stock_Management_System/releases"><img src="https://img.shields.io/badge/version-v1.0.0-blue" alt="Version"></a>
+  <a href="https://en.wikipedia.org/wiki/C_(programming_language)"><img src="https://img.shields.io/badge/language-C-blue" alt="Language"></a>
+  <a href="https://github.com/SBAI-Youness/Stock_Management_System/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="Contributions"></a>
+</p>
+
 
 ## Overview
 The **Stock Management System** is a console-based application developed in C for managing inventory efficiently. It provides functionalities for handling product details and storing data persistently in CSV files. Designed with a user-friendly console interface, it simplifies inventory management tasks.
