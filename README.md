@@ -41,7 +41,7 @@ The **Stock Management System** is a console-based application developed in C fo
 - **Persistent Storage**:
   Save product data in a CSV file for future access.
 - **Security Features**:
-  - Password Hashing with OpenSSL: User passwords are securely hashed before storage to protect against unauthorized access.
+  - Password Hashing with OpenSSL: User passwords are securely salted and hashed before storage to enhance protection against unauthorized access.
   - Brute Force Prevention: Implemented mechanisms to prevent brute force attacks, ensuring the security of user accounts.
   - DDoS Protection: Measures in place to mitigate Distributed Denial of Service attacks, ensuring the availability of the system.
 
