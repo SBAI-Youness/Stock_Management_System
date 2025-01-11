@@ -13,9 +13,10 @@ struct User *create_user() {
   // Allocate memory for user attributes
   new_user->username = (char *) malloc((MAX_USERNAME_LENGTH + 1) * sizeof(char));
   new_user->password = (char *) malloc((MAX_PASSWORD_LENGTH + 1) * sizeof(char));
+  new_user->salt = (char *) malloc((SALT_LENGTH + 1) * sizeof(char));
 
   // Check if memory allocation was successful
-  if (new_user->username == NULL || new_user->password == NULL) {
+  if (new_user->username == NULL || new_user->password == NULL || new_user->salt == NULL) {
     print_error_message("Failed to allocate memory for the new user attributes");
     free_user(new_user);
     return NULL;
@@ -65,6 +66,9 @@ void sign_up() {
 
   // Set the user's password
   user->set_password(user);
+
+  // Generate a random salt
+  generate_salt(user->salt);
 
   // Save the user to the users file
   user->save_user(user);
@@ -376,17 +380,34 @@ bool is_password_valid(const char *password) {
   return criteria_met >= 3;
 }
 
-char *hash_password(const char *password) {
-  if (password == NULL)
+void generate_salt(char *salt) {
+  // Charset for generating random salt
+  const char *charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  size_t charset_size = strlen(charset); // Get the size of the charset (62 characters)
+
+  for (size_t i = 0; i < SALT_LENGTH; i++)
+    salt[i] = charset[rand() % charset_size];
+
+  salt[SALT_LENGTH] = '\0';
+}
+
+char *hash_password_with_salt(const char *password, const char *salt) {
+  if (password == NULL || salt == NULL)
     return NULL;
 
   unsigned char hash[SHA256_DIGEST_LENGTH];
   static char hash_hex[(SHA256_DIGEST_LENGTH * 2) + 1];
+  char salted_password[MAX_PASSWORD_LENGTH + SALT_LENGTH + 1];
 
-  SHA256((unsigned char *)password, strlen(password), hash);
+  // Combine password and salt
+  snprintf(salted_password, sizeof(salted_password), "%s%s", password, salt);
 
+  // Perform SHA-256 hashing
+  SHA256((unsigned char *)salted_password, strlen(salted_password), hash);
+
+  // Convert the hash to hexadecimal
   for (size_t i = 0; i < SHA256_DIGEST_LENGTH; i++)
-    sprintf(hash_hex + i * 2, "%02x", hash[i]);
+    sprintf(hash_hex + (i * 2), "%02x", hash[i]);
 
   return hash_hex;
 }
@@ -423,24 +444,22 @@ bool authenticate_user(const char *username, const char *password) {
     return false;
   }
 
-  // Hash the password to compare it with the hashed password in the users file
-  char *hashed_password = hash_password(password);
-
-  // Check if the password was hashed successfully
-  if (hashed_password == NULL) {
-    print_error_message("Failed to hash the password");
-    fclose(file);
-    return false;
-  }
-
   char temp_username[MAX_USERNAME_LENGTH + 1],
-       temp_password[(SHA256_DIGEST_LENGTH * 2) + 1];
+       temp_password[(SHA256_DIGEST_LENGTH * 2) + 1],
+       temp_salt[SALT_LENGTH + 1];
 
-  while (fscanf(file, "%16[^,],%64[^\n]\n", temp_username, temp_password) == 2)
-    if (strcmp(temp_username, username) == 0 && strcmp(temp_password, hashed_password) == 0) {
-      fclose(file);
-      return true; // Authentication successful
+  while (fscanf(file, "%16[^,],%64[^,],%16[^\n]\n", temp_username, temp_password, temp_salt) == 3) {
+    if (strcmp(temp_username, username) == 0) {
+      // Hash the entered password with the stored salt
+      char *hashed_password = hash_password_with_salt(password, temp_salt);
+
+      // Check if the password matches the stored hash
+      if (hashed_password != NULL && strcmp(temp_password, hashed_password) == 0) {
+        fclose(file);
+        return true; // Authentication successful
+      }
     }
+  }
 
   fclose(file);
   return false; // Authentication failed
@@ -467,7 +486,7 @@ void save_user(const struct User *self) {
     fprintf(file, USERS_HEADER_FILE); // Write headers
 
   // Hash the password before writing it to the users file
-  char *hashed_password = hash_password(self->password);
+  char *hashed_password = hash_password_with_salt(self->password, self->salt);
 
   // Check if the password was hashed successfully
   if (hashed_password == NULL) {
@@ -476,7 +495,7 @@ void save_user(const struct User *self) {
   }
 
   // Write username and password to the file
-  fprintf(file, "%s,%s\n", self->username, hashed_password);
+  fprintf(file, "%s,%s,%s\n", self->username, hashed_password, self->salt);
 
   fclose(file); // Close the file after writing
 }

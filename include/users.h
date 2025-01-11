@@ -6,7 +6,7 @@
 #define USERS_FILE "../data/users.csv"
 
 // Header line for the users file
-#define USERS_HEADER_FILE "Username,Password\n"
+#define USERS_HEADER_FILE "Username,Hashed Password,Salt\n"
 
 #define MIN_USERNAME_LENGTH 4
 #define MAX_USERNAME_LENGTH 16
@@ -14,11 +14,14 @@
 #define MIN_PASSWORD_LENGTH 6
 #define MAX_PASSWORD_LENGTH 36
 
+#define SALT_LENGTH 16
+
 // User structure with attributes and methods (function pointers)
 struct User {
   //* User attributes
   char *username;
   char *password;
+  char *salt;
 
   //* User methods
   void (*set_username)(struct User *self);
@@ -55,8 +58,11 @@ extern void set_password(struct User *self);
 // Function used to check if the password is valid
 extern bool is_password_valid(const char *password);
 
+// Function used to generate a random salt
+extern void generate_salt(char *salt);
+
 // Function used to hash the user's password
-extern char *hash_password(const char *password);
+extern char *hash_password_with_salt(const char *password, const char *salt);
 
 // Function used to check if a username is taken or not
 extern bool is_username_taken(const char *username);
