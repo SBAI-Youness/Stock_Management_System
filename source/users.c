@@ -384,11 +384,32 @@ void generate_salt(char *salt) {
   // Charset for generating random salt
   const char *charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   size_t charset_size = strlen(charset); // Get the size of the charset (62 characters)
+  bool isUnique = false; // Flag to check if the salt is unique or not
 
-  for (size_t i = 0; i < SALT_LENGTH; i++)
-    salt[i] = charset[rand() % charset_size];
+  do {
+    for (size_t i = 0; i < SALT_LENGTH; i++)
+      salt[i] = charset[rand() % charset_size]; // Generate a random character from the charset
+  } while (is_salt_taken(salt) == true); // Keep generating until a unique salt is found
 
   salt[SALT_LENGTH] = '\0';
+}
+
+bool is_salt_taken(const char *salt) {
+  FILE *file = fopen(USERS_FILE, "r");
+  if (file == NULL) {
+    print_error_message("Unable to open the users file");
+    return false;
+  }
+
+  char temp_salt[SALT_LENGTH + 1];
+  while (fscanf(file, "%*[^,],%*[^,],%16[^\n]\n", temp_salt) == 1)
+    if (strcmp(temp_salt, salt) == 0) {
+      fclose(file);
+      return true; // Salt is already in use
+    }
+
+  fclose(file);
+  return false; // Salt is unique
 }
 
 char *hash_password_with_salt(const char *password, const char *salt) {

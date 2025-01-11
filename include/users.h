@@ -61,6 +61,9 @@ extern bool is_password_valid(const char *password);
 // Function used to generate a random salt
 extern void generate_salt(char *salt);
 
+// Function used to check if the salt is taken by another user or not
+extern bool is_salt_taken(const char *salt);
+
 // Function used to hash the user's password
 extern char *hash_password_with_salt(const char *password, const char *salt);
 
