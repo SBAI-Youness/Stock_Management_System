@@ -12,7 +12,8 @@ void display_main_menu_and_get_choice(size_t *menu_choice) {
   printf("2. Login\n");
   printf("3. Exit\n");
   printf(" >> ");
-  if (scanf("%zu", &(*menu_choice)) != 1) // Read the user's choice
+  char extra;
+  if (scanf("%zu%c", &(*menu_choice), &extra) != 2 || extra != '\n') // Read the user's choice
     (*menu_choice) = 0; // If the user's choice is not a number, set it to 0
   rewind(stdin); // Clear input buffer
 }

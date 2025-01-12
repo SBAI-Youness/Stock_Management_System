@@ -141,6 +141,7 @@ void log_in() {
 
 void user_session(const struct User *user) {
   size_t session_choice; // Variable to store the user's choice
+  char extra;
 
   do {
     print_project_name();
@@ -153,7 +154,7 @@ void user_session(const struct User *user) {
     printf("6. Log out\n");
     printf("7. Exit\n");
     printf(" >> ");
-    if (scanf("%zu", &session_choice) != 1) // Read the user's choice
+    if (scanf("%zu%c", &session_choice, &extra) != 2 || extra != '\n') // Read the user's choice
       session_choice = 0; // If the user's choice is not a number, set it to 0
     rewind(stdin); // Clear input buffer
 
@@ -384,7 +385,6 @@ void generate_salt(char *salt) {
   // Charset for generating random salt
   const char *charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   size_t charset_size = strlen(charset); // Get the size of the charset (62 characters)
-  bool isUnique = false; // Flag to check if the salt is unique or not
 
   do {
     for (size_t i = 0; i < SALT_LENGTH; i++)
@@ -400,6 +400,9 @@ bool is_salt_taken(const char *salt) {
     print_error_message("Unable to open the users file");
     return false;
   }
+
+  // Skip the header line
+  fseek(file, strlen(USERS_HEADER_FILE), SEEK_SET);
 
   char temp_salt[SALT_LENGTH + 1];
   while (fscanf(file, "%*[^,],%*[^,],%16[^\n]\n", temp_salt) == 1)

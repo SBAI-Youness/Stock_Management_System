@@ -42,6 +42,7 @@ void set_product_methods(struct Product *product) {
 
 void product_management_menu(const struct User *user) {
   size_t menu_choice; // Variable to store the user's choice
+  char extra;
 
   do {
     print_project_name();
@@ -51,7 +52,7 @@ void product_management_menu(const struct User *user) {
     printf("3. Delete Product\n");
     printf("4. Go Back\n");
     printf(" >> ");
-    if (scanf("%zu", &menu_choice) != 1) // Read the user's choice
+    if (scanf("%zu%c", &menu_choice, &extra) != 2 || extra != '\n') // Read the user's choice
       menu_choice = 0; // If the user's choice is not a number, set it to 0
     rewind(stdin); // Clear input buffer
 
@@ -340,6 +341,7 @@ void set_unit_price(struct Product *self) {
   }
 
   float price;
+  char extra;
   bool isValid = false; // Flag to check if the product's unit price is valid or not
 
   while (isValid == false) {
@@ -347,8 +349,8 @@ void set_unit_price(struct Product *self) {
     rewind(stdin);
 
     // Read the unit price from the user
-    if (scanf("%f", &price) != 1) {
-      print_error_message("Invalid input. Please enter a valid number");
+    if (scanf("%f%c", &price, &extra) != 2 || extra != '\n') {
+      print_warning_message("Invalid input. Please enter a valid number");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -381,6 +383,7 @@ void set_quantity(struct Product *self) {
   }
 
   size_t quantity;
+  char extra;
   bool isValid = false; // Flag to check if the product's quantity is valid or not
 
   while (isValid == false) {
@@ -388,8 +391,8 @@ void set_quantity(struct Product *self) {
     rewind(stdin);
 
     // Read the unit quantity from the user
-    if (scanf("%zu", &quantity) != 1) {
-      print_error_message("Invalid input. Please enter a valid number");
+    if (scanf("%zu%c", &quantity, &extra) != 2 || extra != '\n') {
+      print_warning_message("Invalid input. Please enter a valid number");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -422,6 +425,7 @@ void set_alert_threshold(struct Product *self) {
   }
 
   size_t threshold;
+  char extra;
   bool isValid = false; // Flag to check if the product's alert threshold is valid or not
 
   while (isValid == false) {
@@ -429,8 +433,8 @@ void set_alert_threshold(struct Product *self) {
     rewind(stdin);
 
     // Read the alert threshold from the user
-    if (scanf("%zu", &threshold) != 1) {
-      print_error_message("Invalid input. Please enter a valid number");
+    if (scanf("%zu%c", &threshold, &extra) != 2 || extra != '\n') {
+      print_warning_message("Invalid input. Please enter a valid number");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -469,11 +473,12 @@ void modify_product(const struct User *user) {
   printf(DARK_GREEN UNDERLINE "\t--- Modify Product ---\n\n" RESET);
 
   unsigned long long int product_id;
+  char extra;
 
   // Set the product's id
   while (true) {
     printf("Id: ");
-    if (scanf("%llu", &product_id) != 1 || product_id == 0) {
+    if (scanf("%llu%c", &product_id, &extra) != 2 || product_id == 0 || extra != '\n') {
       print_warning_message("Invalid product id");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
