@@ -68,6 +68,9 @@ extern void exit_program();
 // Function used to handle invalid choices
 extern void invalid_choice();
 
+// Function used to clear the input buffer
+extern void clear_input_buffer();
+
 // Function used to check if the user should get locked out or not
 extern bool should_user_get_locked_out(uint8_t failed_attempts);
 

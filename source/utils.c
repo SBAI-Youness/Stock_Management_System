@@ -13,9 +13,10 @@ void display_main_menu_and_get_choice(size_t *menu_choice) {
   printf("3. Exit\n");
   printf(" >> ");
   char extra;
-  if (scanf("%zu%c", &(*menu_choice), &extra) != 2 || extra != '\n') // Read the user's choice
+  if (scanf("%zu%c", &(*menu_choice), &extra) != 2 || extra != '\n') { // Read the user's choice
     (*menu_choice) = 0; // If the user's choice is not a number, set it to 0
-  fflush(stdin); // Clear input buffer
+    clear_input_buffer();
+  }
 }
 
 void print_success_message(const char *success_message) {
@@ -52,6 +53,11 @@ void exit_program() {
 
 void invalid_choice() {
   print_warning_message("Invalid choice. Please try again");
+}
+
+void clear_input_buffer() {
+  int c;
+  while ((c = getchar()) != '\n' && c != EOF); //  Clear the input buffer until a newline character or an end of file is encountered
 }
 
 bool should_user_get_locked_out(uint8_t failed_attempts) {

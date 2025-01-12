@@ -52,9 +52,10 @@ void product_management_menu(const struct User *user) {
     printf("3. Delete Product\n");
     printf("4. Go Back\n");
     printf(" >> ");
-    if (scanf("%zu%c", &menu_choice, &extra) != 2 || extra != '\n') // Read the user's choice
+    if (scanf("%zu%c", &menu_choice, &extra) != 2 || extra != '\n') { // Read the user's choice
       menu_choice = 0; // If the user's choice is not a number, set it to 0
-    rewind(stdin); // Clear input buffer
+      clear_input_buffer();
+    }
 
     switch (menu_choice) {
       case 1: // Add a new product
@@ -189,7 +190,6 @@ void set_name(struct Product *self) {
 
   while (isValid == false) {
     printf("Name: ");
-    rewind(stdin);
 
     // Use secure input reading with size limit
     if (fgets(temp_name, sizeof(temp_name) / sizeof(char), stdin) == NULL) {
@@ -281,7 +281,6 @@ void set_description(struct Product *self) {
 
   while (isValid == false) {
     printf("Description: ");
-    rewind(stdin);
 
     // Use secure input reading with size limit
     if (fgets(temp_description, sizeof(temp_description) / sizeof(char), stdin) == NULL) {
@@ -357,13 +356,13 @@ void set_unit_price(struct Product *self) {
 
   while (isValid == false) {
     printf("Unit price: ");
-    rewind(stdin);
 
     // Read the unit price from the user
     if (scanf("%f%c", &price, &extra) != 2 || extra != '\n') {
       print_warning_message("Invalid input. Please enter a valid number");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
+      clear_input_buffer();
       continue;
     }
 
@@ -399,13 +398,13 @@ void set_quantity(struct Product *self) {
 
   while (isValid == false) {
     printf("Quantity: ");
-    rewind(stdin);
 
     // Read the unit quantity from the user
     if (scanf("%zu%c", &quantity, &extra) != 2 || extra != '\n') {
       print_warning_message("Invalid input. Please enter a valid number");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
+      clear_input_buffer();
       continue;
     }
 
@@ -441,13 +440,13 @@ void set_alert_threshold(struct Product *self) {
 
   while (isValid == false) {
     printf("Alert threshold: ");
-    rewind(stdin);
 
     // Read the alert threshold from the user
     if (scanf("%zu%c", &threshold, &extra) != 2 || extra != '\n') {
       print_warning_message("Invalid input. Please enter a valid number");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
+      clear_input_buffer();
       continue;
     }
 
@@ -493,7 +492,7 @@ void modify_product(const struct User *user) {
       print_warning_message("Invalid product id");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
-      rewind(stdin); // Clear the input buffer
+      clear_input_buffer();
       continue;
     }
 

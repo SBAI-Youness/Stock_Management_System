@@ -154,9 +154,10 @@ void user_session(const struct User *user) {
     printf("6. Log out\n");
     printf("7. Exit\n");
     printf(" >> ");
-    if (scanf("%zu%c", &session_choice, &extra) != 2 || extra != '\n') // Read the user's choice
+    if (scanf("%zu%c", &session_choice, &extra) != 2 || extra != '\n') { // Read the user's choice
       session_choice = 0; // If the user's choice is not a number, set it to 0
-    rewind(stdin); // Clear input buffer
+      clear_input_buffer();
+    }
 
     // Perform the action based on the user's choice
     switch (session_choice) {
@@ -215,7 +216,6 @@ void set_username(struct User *self) {
 
   while (isValid == false) {
     printf("Username: ");
-    rewind(stdin);
 
     // Use secure input reading with size limit
     if (fgets(temp_username, sizeof(temp_username) / sizeof(char), stdin) == NULL) {
@@ -303,7 +303,6 @@ void set_password(struct User *self) {
 
   while (isValid == false) {
     printf("Password: ");
-    rewind(stdin);
 
     // Get current console mode
     GetConsoleMode(hStdin, &mode);

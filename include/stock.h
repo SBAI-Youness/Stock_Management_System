@@ -9,7 +9,7 @@
 #define STOCK_HEADER_FILE "Id,Name,Description,Username,Unit Price(in $),Stock Quantity,Stock Alert Threshold,Last Stock Entry Date,Last Stock Exit Date\n"
 
 #define MIN_NAME_LENGTH 4
-#define MAX_NAME_LENGTH 16
+#define MAX_NAME_LENGTH 20
 
 #define MIN_DESCRIPTION_LENGTH 8
 #define MAX_DESCRIPTION_LENGTH 64
