@@ -1,0 +1,29 @@
+classDiagram
+    direction LR
+    
+    class User {
+        username (PK)
+        password
+        salt
+    }
+
+    class Product {
+        id (PK)
+        name
+        description
+        username (FK)
+        unit_price
+        quantity
+        alert_threshold
+        last_entry_date
+        last_exit_date
+    }
+
+    class Date {
+        day
+        month
+        year
+    }
+
+    User "1" -- "*" Product : manages >
+    Product "*" -- "2" Date : has >
