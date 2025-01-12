@@ -1,0 +1,91 @@
+flowchart TD
+    A[Start Program] --> B{Main Menu}
+    
+    %% Main Menu Options
+    B -->|1| C[Sign Up]
+    B -->|2| D[Login]
+    B -->|3| E[Exit]
+    
+    %% Sign Up Flow
+    C --> C1[Create User]
+    C1 --> C2{Username Valid?}
+    C2 -->|No| C1
+    C2 -->|Yes| C3{Username Available?}
+    C3 -->|No| C1
+    C3 -->|Yes| C4[Set Password]
+    C4 --> C4A{Password Valid?}
+    C4A -->|No| C4
+    C4A -->|Yes| C5[Generate Salt]
+    C5 --> C6[Save User]
+    C6 --> F[User Session]
+    
+    %% Login Flow
+    D --> D1[Enter Credentials]
+    D1 --> D2{Check Lockout}
+    D2 -->|Locked| D3[Wait Lockout Period]
+    D3 --> D1
+    D2 -->|Not Locked| D4{Authenticate}
+    D4 -->|Failed| D5[Increment Failed Attempts]
+    D5 --> D1
+    D4 -->|Success| F
+    
+    %% User Session Menu
+    F --> G{Session Menu}
+    G -->|1| H[View Profile]
+    G -->|2| I[Product Management]
+    G -->|3| J[View Products]
+    G -->|4| K[Search Products]
+    G -->|5| L[Sort Products]
+    G -->|6| M[Logout]
+    G -->|7| E
+    
+    %% Product Management Flow
+    I --> I1{Product Menu}
+    I1 -->|1| I2[Add Product]
+    I1 -->|2| I3[Modify Product]
+    I1 -->|3| I4[Delete Product]
+    I1 -->|4| G
+    
+    %% Add Product Flow
+    I2 --> I2A[Enter Product Details]
+    I2A --> I2B{Validate Details}
+    I2B -->|Invalid| I2A
+    I2B -->|Valid| I2C[Save Product]
+    I2C --> I1
+    
+    %% Modify Product Flow
+    I3 --> I3A[Enter Product ID]
+    I3A --> I3B{Product Exists?}
+    I3B -->|No| I1
+    I3B -->|Yes| I3C[Update Details]
+    I3C --> I3D[Save Changes]
+    I3D --> I1
+    
+    %% Delete Product Flow
+    I4 --> I4A[Enter Product Name]
+    I4A --> I4B{Product Exists?}
+    I4B -->|No| I1
+    I4B -->|Yes| I4C[Delete Product]
+    I4C --> I1
+    
+    %% Return Flows
+    H --> G
+    J --> G
+    K --> G
+    L --> G
+    M --> B
+    
+    %% Exit Flow
+    E --> N[End Program]
+
+    %% Style Definitions
+    classDef menu fill:#B2EBF2,stroke:#006064,stroke-width:2px,color:#000000
+    classDef process fill:#C8E6C9,stroke:#1B5E20,stroke-width:2px,color:#000000
+    classDef decision fill:#FFE0B2,stroke:#E65100,stroke-width:2px,color:#000000
+    classDef terminal fill:#E8EAF6,stroke:#1A237E,stroke-width:2px,color:#000000
+    
+    %% Apply Styles
+    class B,G,I1 menu
+    class C1,C4,C5,C6,D1,D3,D5,H,I2,I3,I4,J,K,L,M process
+    class C2,C3,C4A,D2,D4,I2B,I3B,I4B decision
+    class A,N terminal
