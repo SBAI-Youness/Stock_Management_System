@@ -44,80 +44,168 @@ struct Product {
   void (*free_product)(struct Product *self);
 };
 
-// Function used to create a new product
+/**
+ * Creates and initializes a new Product structure
+ * @return Pointer to newly allocated Product structure
+*/
 extern struct Product *create_product();
 
-// Function used to set the product's methods
+/**
+ * Sets up function pointers for Product methods
+ * @param product Pointer to Product structure to initialize
+*/
 extern void set_product_methods(struct Product *product);
 
-// Function used to display the product management menu
+/**
+ * Displays and handles the product management menu options
+ * @param user Pointer to the current logged-in user
+*/
 extern void product_management_menu(const struct User *user);
 
-// Function used to add a product
+/**
+ * Handles the process of adding a new product
+ * @param user Pointer to the current logged-in user
+*/
 extern void add_product(const struct User *user);
 
-// Function used to generate a unique id for a product
+/**
+ * Generates a unique numeric identifier for a new product
+ * @return Unique product ID
+*/
 extern unsigned long long int generate_unique_product_id();
 
-// Function used to check if a product id is already taken
+/**
+ * Checks if a product ID is already in use
+ * @param id Product ID to check
+ * @return true if ID is taken, false otherwise
+*/
 extern bool is_product_id_taken(unsigned long long int id);
 
-// Function used to set the product's name
+/**
+ * Sets the name for a product
+ * @param self Pointer to Product structure
+*/
 extern void set_name(struct Product *self);
 
-// Function used to check if the product's name is valid
+/**
+ * Validates a product name against system requirements
+ * @param name Product name to validate
+ * @return true if name is valid, false otherwise
+*/
 extern bool is_name_valid(const char *name);
 
-// Function used to set the product's description
+/**
+ * Sets the description for a product
+ * @param self Pointer to Product structure
+*/
 extern void set_description(struct Product *self);
 
-// Function used to check if the product's description is valid
+/**
+ * Validates a product description against system requirements
+ * @param description Product description to validate
+ * @return true if description is valid, false otherwise
+*/
 extern bool is_description_valid(const char *description);
 
-// Function used to set the product's unit price
+/**
+ * Sets the unit price for a product
+ * @param self Pointer to Product structure
+*/
 extern void set_unit_price(struct Product *self);
 
-// Function used to check if the product's unit price is valid
+/**
+ * Validates a product unit price
+ * @param price Price to validate
+ * @return true if price is valid, false otherwise
+*/
 extern bool is_unit_price_valid(float price);
 
-// Function used to set the product's quantity
+/**
+ * Sets the quantity for a product
+ * @param self Pointer to Product structure
+*/
 extern void set_quantity(struct Product *self);
 
-// Function used to check if the product's quantity is valid
+/**
+ * Validates a product quantity
+ * @param quantity Quantity to validate
+ * @return true if quantity is valid, false otherwise
+*/
 extern bool is_quantity_valid(size_t quantity);
 
-// Function used to set the product's alert threshold
+/**
+ * Sets the alert threshold for a product
+ * @param self Pointer to Product structure
+*/
 extern void set_alert_threshold(struct Product *self);
 
-// Function used to check if the product's alert threshold is valid
+/**
+ * Validates a product alert threshold
+ * @param threshold Threshold to validate
+ * @param quantity Current product quantity
+ * @return true if threshold is valid, false otherwise
+*/
 extern bool is_alert_threshold_valid(size_t threshold, size_t quantity);
 
-// Function used to set a Date structure to the current date
+/**
+ * Sets a Date structure to the current system date
+ * @param date Pointer to Date structure to update
+*/
 extern void set_current_date(struct Date *date);
 
-// Function used to modify a product
+/**
+ * Handles the process of modifying an existing product
+ * @param user Pointer to the current logged-in user
+*/
 extern void modify_product(const struct User *user);
 
-// Function used to delete a product
+/**
+ * Handles the process of deleting a product
+ * @param user Pointer to the current logged-in user
+*/
 extern void delete_product(const struct User *user);
 
-// Function used to view the products in the stock
+/**
+ * Displays all products for the current user
+ * @param user Pointer to the current logged-in user
+*/
 extern void view_products(const struct User *user);
 
-// Function used to search for a product by its name and username
+/**
+ * Searches for a product by name and owner username
+ * @param name Product name to search for
+ * @param username Username of product owner
+ * @return Pointer to found Product or NULL if not found
+*/
 extern struct Product *search_product(const char *name, const char *username);
 
-// Function used to sort the database by name
+/**
+ * Sorts the product database alphabetically by name
+*/
 extern void sort_products_by_name();
 
-// Function used to compare products by name
+/**
+ * Comparison function for sorting products by name
+ * @param a Pointer to first Product to compare
+ * @param b Pointer to second Product to compare
+ * @return Negative if a < b, 0 if equal, positive if a > b
+*/
 extern int compare_products_by_name(const void *a, const void *b);
 
-// Function used to display a product's information
+/**
+ * Displays product information
+ * @param self Pointer to Product structure to display
+*/
 extern void display_product(const struct Product *self);
 
-// Function used to save a product's information to a CSV file
+/**
+ * Saves product data to CSV file
+ * @param self Pointer to Product structure to save
+*/
 extern void save_product(const struct Product *self);
 
-// Function used to free the memory allocated for a product
+/**
+ * Frees all memory associated with a Product structure
+ * @param self Pointer to Product structure to free
+*/
 extern void free_product(struct Product *self);

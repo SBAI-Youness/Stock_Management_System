@@ -44,44 +44,89 @@
 #define BOLD        "\033[1m"
 #define UNDERLINE   "\033[4m"
 
-// Function used to print the project name
+/**
+ * Prints the project name with styling and formatting
+*/
 extern void print_project_name();
 
-// Function used to display the main menu and get the user's choice
+/**
+ * Displays the main menu options and gets user input
+ * @param menu_choice Pointer to store the user's menu selection
+*/
 extern void display_main_menu_and_get_choice(size_t *menu_choice);
 
-// Function used to print success messages
+/**
+ * Prints a success message in green color
+ * @param success_message The message to display
+*/
 extern void print_success_message(const char *success_message);
 
-// Function used to print warning messages
+/**
+ * Prints a warning message in orange color with variable arguments
+ * @param warning_message The format string for the warning
+ * @param ... Variable arguments for the format string
+*/
 extern void print_warning_message(const char *warning_message, ...);
 
-// Function used to print error messages
+/**
+ * Prints an error message in red color
+ * @param error_message The message to display
+*/
 extern void print_error_message(const char *error_message);
 
-// Function used to log out of the session
+/**
+ * Handles the user logout process and cleanup
+*/
 extern void log_out();
 
-// Function used to exit the program
+/**
+ * Safely exits the program with cleanup
+*/
 extern void exit_program();
 
-// Function used to handle invalid choices
+/**
+ * Handles invalid menu choice selections
+*/
 extern void invalid_choice();
 
-// Function used to clear the input buffer
+/**
+ * Clears any remaining characters in the input buffer
+*/
 extern void clear_input_buffer();
 
-// Function used to check if the user should get locked out or not
+/**
+ * Determines if a user should be locked out based on failed attempts
+ * @param failed_attempts Number of consecutive failed login attempts
+ * @return true if user should be locked out, false otherwise
+*/
 extern bool should_user_get_locked_out(uint8_t failed_attempts);
 
-// Function used to handle the lockout logic
+/**
+ * Handles user lockout logic after failed login attempts
+ * @param failed_attempts Pointer to number of failed attempts
+ * @param lockout_time Pointer to the current lockout duration
+ * @param lockout_start Pointer to the lockout start timestamp
+*/
 extern void handle_lockout(uint8_t *failed_attempts, uint32_t *lockout_time, time_t *lockout_start);
 
-// Function used to display the lockout time
+/**
+ * Displays the remaining lockout time to the user
+ * @param seconds Number of seconds remaining in lockout
+*/
 extern void display_lockout_time(uint32_t seconds);
 
-// Function used to load the lockout data from a file
+/**
+ * Loads previous lockout data from file
+ * @param failed_attempts Pointer to store number of failed attempts
+ * @param lockout_time Pointer to store lockout duration
+ * @param lockout_start Pointer to store lockout start time
+*/
 extern void load_lockout_data(uint8_t *failed_attempts, uint32_t *lockout_time, time_t *lockout_start);
 
-// Function used to save the lockout data to a file
+/**
+ * Saves current lockout state to file
+ * @param failed_attempts Current number of failed attempts
+ * @param lockout_time Current lockout duration
+ * @param lockout_start Current lockout start timestamp
+*/
 extern void save_lockout_data(uint8_t failed_attempts, uint32_t lockout_time, time_t lockout_start);

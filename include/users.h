@@ -31,53 +31,110 @@ struct User {
   void (*free_user)(struct User *self);
 };
 
-// Function used to create and initialize a new user
+/**
+ * Creates and initializes a new User structure
+ * @return Pointer to newly allocated User structure
+*/
 extern struct User *create_user();
 
-// Function used to set the user methods
+/**
+ * Sets up function pointers for User methods
+ * @param user Pointer to User structure to initialize
+*/
 extern void set_user_methods(struct User *user);
 
-// Function used to handle user sign up process
+/**
+ * Handles the complete user registration process
+*/
 extern void sign_up();
 
-// Function used to handle user log in process
+/**
+ * Handles the user authentication process
+*/
 extern void log_in();
 
-// Function used to manage and handle a session for a given user
+/**
+ * Manages an active user session after successful login
+ * @param user Pointer to authenticated User structure
+*/
 extern void user_session(const struct User *user);
 
-// Function used to read the user's username in a secure way
+/**
+ * Securely reads and sets the username for a user
+ * @param self Pointer to User structure
+*/
 extern void set_username(struct User *self);
 
-// Function used to check if the username is valid
+/**
+ * Validates a username against system requirements
+ * @param username Username to validate
+ * @return true if username is valid, false otherwise
+*/
 extern bool is_username_valid(const char *username);
 
-// Function used to read the user's password in a secure way
+/**
+ * Securely reads and sets the password for a user
+ * @param self Pointer to User structure
+*/
 extern void set_password(struct User *self);
 
-// Function used to check if the password is valid
+/**
+ * Validates a password against system requirements
+ * @param password Password to validate
+ * @return true if password is valid, false otherwise
+*/
 extern bool is_password_valid(const char *password);
 
-// Function used to generate a random salt
+/**
+ * Generates a cryptographic salt for password hashing
+ * @param salt Buffer to store generated salt
+*/
 extern void generate_salt(char *salt);
 
-// Function used to check if the salt is taken by another user or not
+/**
+ * Checks if a salt is already in use
+ * @param salt Salt to check
+ * @return true if salt is taken, false otherwise
+*/
 extern bool is_salt_taken(const char *salt);
 
-// Function used to hash the user's password
+/**
+ * Hashes a password with given salt using SHA-256
+ * @param password Plain text password to hash
+ * @param salt Salt to use in hashing
+ * @return Allocated string containing hashed password
+*/
 extern char *hash_password_with_salt(const char *password, const char *salt);
 
-// Function used to check if a username is taken or not
+/**
+ * Checks if a username is already registered
+ * @param username Username to check
+ * @return true if username is taken, false otherwise
+*/
 extern bool is_username_taken(const char *username);
 
-// Function used to authenticate the user
+/**
+ * Authenticates a user with username and password
+ * @param username Username to authenticate
+ * @param password Password to verify
+ * @return true if authentication successful, false otherwise
+*/
 extern bool authenticate_user(const char *username, const char *password);
 
-// Function used to display the user's information
+/**
+ * Displays user information
+ * @param self Pointer to User structure to display
+*/
 extern void display_user(const struct User *self);
 
-// Function used to save the user data to a CSV file
+/**
+ * Saves user data to CSV file
+ * @param self Pointer to User structure to save
+*/
 extern void save_user(const struct User *self);
 
-// Function used to free the memory allocated for a user
+/**
+ * Frees all memory associated with a User structure
+ * @param self Pointer to User structure to free
+*/
 extern void free_user(struct User *self);
