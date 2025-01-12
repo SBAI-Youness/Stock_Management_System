@@ -265,11 +265,10 @@ bool is_username_valid(const char *username) {
     return false;
 
   bool hasAlphaNumeric = false;
-  size_t underscore_count = 0,
-         length = strnlen(username, MAX_USERNAME_LENGTH);
+  size_t underscore_count = 0;
 
   // Check if username contains only alphanumeric characters and maximum 2 underscores
-  for (size_t i = 0; i < length; i++) {
+  for (size_t i = 0; username[i] != '\0'; i++) {
     unsigned char c = (unsigned char) username[i];
 
     if (isalnum(c))
@@ -361,9 +360,8 @@ bool is_password_valid(const char *password) {
        hasLower = false,
        hasUpper = false,
        hasSpecial = false;
-  size_t length = strnlen(password, MAX_PASSWORD_LENGTH);
 
-  for (size_t i = 0; i < length; i++) {
+  for (size_t i = 0; password[i] != '\0'; i++) {
     unsigned char c = (unsigned char) password[i];
 
     if (isdigit(c))
@@ -472,7 +470,7 @@ bool authenticate_user(const char *username, const char *password) {
        temp_password[(SHA256_DIGEST_LENGTH * 2) + 1],
        temp_salt[SALT_LENGTH + 1];
 
-  while (fscanf(file, "%16[^,],%64[^,],%16[^\n]\n", temp_username, temp_password, temp_salt) == 3) {
+  while (fscanf(file, "%16[^,],%64[^,],%16[^\n]\n", temp_username, temp_password, temp_salt) == 3)
     if (strcmp(temp_username, username) == 0) {
       // Hash the entered password with the stored salt
       char *hashed_password = hash_password_with_salt(password, temp_salt);
@@ -483,7 +481,6 @@ bool authenticate_user(const char *username, const char *password) {
         return true; // Authentication successful
       }
     }
-  }
 
   fclose(file);
   return false; // Authentication failed

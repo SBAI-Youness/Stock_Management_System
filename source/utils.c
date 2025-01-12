@@ -1,12 +1,12 @@
 #include "../include/utils.h"
 
 void print_project_name() {
-  system("cls");
+  system("cls"); // Clear the screen
   printf(BLUE BOLD UNDERLINE "\t\t=== %s ===\n\n" RESET, PROJECT_NAME);
 }
 
 void display_main_menu_and_get_choice(size_t *menu_choice) {
-  system("cls");
+  system("cls"); // Clear the screen
   print_project_name();
   printf("1. Sign Up\n");
   printf("2. Login\n");
@@ -15,7 +15,7 @@ void display_main_menu_and_get_choice(size_t *menu_choice) {
   char extra;
   if (scanf("%zu%c", &(*menu_choice), &extra) != 2 || extra != '\n') // Read the user's choice
     (*menu_choice) = 0; // If the user's choice is not a number, set it to 0
-  rewind(stdin); // Clear input buffer
+  fflush(stdin); // Clear input buffer
 }
 
 void print_success_message(const char *success_message) {
@@ -55,7 +55,7 @@ void invalid_choice() {
 }
 
 bool should_user_get_locked_out(uint8_t failed_attempts) {
-  return failed_attempts >= MAX_FAILED_ATTEMPTS;
+  return failed_attempts >= MAX_FAILED_ATTEMPTS; // Check if the user has failed too many attempts
 }
 
 void handle_lockout(uint8_t *failed_attempts, uint32_t *lockout_time, time_t *lockout_start) {

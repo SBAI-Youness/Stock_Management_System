@@ -240,11 +240,10 @@ bool is_name_valid(const char *name) {
 
   bool hasAlphaNumeric = false;
   size_t dash_count = 0,
-         space_count = 0,
-         length = strnlen(name, MAX_NAME_LENGTH);
+         space_count = 0;
 
   // Check if name contains only alphanumeric characters, maximum 2 dashs and 2 spaces
-  for (size_t i = 0; i < length; i++) {
+  for (size_t i = 0; name[i] != '\0'; i++) {
     unsigned char c = (unsigned char) name[i];
 
     if (isalnum(c))
@@ -305,7 +304,7 @@ void set_description(struct Product *self) {
 
     // Check if the description is valid
     if (is_description_valid(temp_description) == false) {
-      print_warning_message("Description can only contain characters (alphanumeric and spaces)");
+      print_warning_message("Description must contain at least two letters or numbers and can include spaces, commas, periods, dashes, apostrophes, slashes, and exclamation marks.");
       printf("\033[A\033[2K");
       printf("\033[A\033[2K");
       continue;
@@ -319,18 +318,30 @@ void set_description(struct Product *self) {
 }
 
 bool is_description_valid(const char *description) {
-  // Check if description is NULL
-  if (description == NULL)
-    return false;
+  if (description == NULL) return false;
 
-  size_t length = strnlen(description, MAX_DESCRIPTION_LENGTH);
+  int alphanumeric_count = 0;
+  int symbol_count = 0;
 
-  // Check if description contains only valid characters (alphanumeric and spaces)
-  for (size_t i = 0; i < length; i++)
-    if (!isalnum(description[i]) && !isspace(description[i]))
-      return false;
+  for (size_t i = 0; description[i] != '\0'; i++) {
+    if (isalnum(description[i]))
+      alphanumeric_count++;  // Count letters and digits
+    else if (description[i] == ' ' ||
+             description[i] == ',' ||
+             description[i] == '.' ||
+             description[i] == '-' ||
+             description[i] == '!' ||
+             description[i] == '\'' ||
+             description[i] == '/')
+      symbol_count++;  // Count allowed symbols
+    else
+      return false;  // Invalid character detected
+  }
 
-  return true;
+  // Conditions:
+  // - At least 2 alphanumeric characters
+  // - Alphanumeric characters must be more than half of total characters
+  return (alphanumeric_count >= 2) && (alphanumeric_count > (symbol_count / 2));
 }
 
 void set_unit_price(struct Product *self) {
@@ -884,15 +895,15 @@ void sort_products_by_name() {
   // Write the sorted products to the file
   for (size_t i = 0; i < product_count; i++) {
     fprintf(file, "%llu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
-            products[i]->id,
-            products[i]->name,
-            products[i]->description,
-            products[i]->username,
-            products[i]->unit_price,
-            products[i]->quantity,
-            products[i]->alert_threshold,
-            products[i]->last_entry_date.day, products[i]->last_entry_date.month, products[i]->last_entry_date.year,
-            products[i]->last_exit_date.day, products[i]->last_exit_date.month, products[i]->last_exit_date.year);
+                   products[i]->id,
+                   products[i]->name,
+                   products[i]->description,
+                   products[i]->username,
+                   products[i]->unit_price,
+                   products[i]->quantity,
+                   products[i]->alert_threshold,
+                   products[i]->last_entry_date.day, products[i]->last_entry_date.month, products[i]->last_entry_date.year,
+                   products[i]->last_exit_date.day, products[i]->last_exit_date.month, products[i]->last_exit_date.year);
     products[i]->free_product(products[i]);
   }
 
@@ -941,15 +952,15 @@ void save_product(const struct Product *self) {
 
   // Write product data to the file
   fprintf(file, "%llu,%s,%s,%s,%.2f,%zu,%zu,%hhu/%hhu/%hu,%hhu/%hhu/%hu\n",
-          self->id,
-          self->name,
-          self->description,
-          self->username,
-          self->unit_price,
-          self->quantity,
-          self->alert_threshold,
-          self->last_entry_date.day, self->last_entry_date.month, self->last_entry_date.year,
-          self->last_exit_date.day, self->last_exit_date.month, self->last_exit_date.year);
+                 self->id,
+                 self->name,
+                 self->description,
+                 self->username,
+                 self->unit_price,
+                 self->quantity,
+                 self->alert_threshold,
+                 self->last_entry_date.day, self->last_entry_date.month, self->last_entry_date.year,
+                 self->last_exit_date.day, self->last_exit_date.month, self->last_exit_date.year);
 
   fclose(file); // Close the file after writing
 }
