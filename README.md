@@ -54,6 +54,28 @@ The **Stock Management System** is a console-based application developed in C fo
 - **Interface**: Console
 
 
+## Prerequisites
+
+To run this project, you need to install:
+
+1. **MinGW-w64**: C compiler for Windows
+   - Download from [MinGW-w64 releases](https://github.com/niXman/mingw-builds-binaries/releases)
+
+2. **OpenSSL**: Required for security features
+   - Download from [OpenSSL for Windows](https://slproweb.com/products/Win32OpenSSL.html)
+
+3. **Make**: For building the project
+   - Download from [Make for Windows](https://gnuwin32.sourceforge.net/packages/make.htm)
+
+After installation, verify everything works by running:
+```bash
+gcc --version
+openssl version
+make --version
+windres --version
+```
+
+
 ## How to Build and Run
 
 1. Clone the repository:
